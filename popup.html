@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume Booster</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Volume Booster</h1>
+        </div>
+        
+        <div class="control-group">
+            <div class="value-display">
+                <span id="volumeValue">100</span>%
+            </div>
+            <input type="range" id="volumeSlider" min="100" max="600" value="100" step="10">
+        </div>
+
+        <button id="resetBtn">Reset</button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
