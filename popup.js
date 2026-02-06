@@ -1,37 +1,47 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // UI Elements
     const slider = document.getElementById('volumeSlider');
     const display = document.getElementById('volumeValue');
-    const resetBtn = document.getElementById('resetBtn');
+    const currentFavicon = document.getElementById('currentFavicon');
+    const currentTitle = document.getElementById('currentTitle');
+    const audioTabsList = document.getElementById('audioTabsList');
+    const noAudioMsg = document.getElementById('noAudioMsg');
 
     // Get current tab
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    // Load saved settings for this tab
-    const key = `volume_${tab.id}`;
-    chrome.storage.local.get([key], (result) => {
-        if (result[key]) {
-            const val = result[key];
-            slider.value = val;
-            display.textContent = val;
-            updateIcon(val);
+    // Initialize Current Tab Info
+    if (currentTab) {
+        currentTitle.textContent = currentTab.title;
+        if (currentTab.favIconUrl) {
+            currentFavicon.src = currentTab.favIconUrl;
+        } else {
+            // Placeholder or transparent
+            currentFavicon.style.opacity = '0';
         }
-    });
 
-    // Slider input event
+        // Load saved volume
+        const key = `volume_${currentTab.id}`;
+        chrome.storage.local.get([key], (result) => {
+            if (result[key]) {
+                const val = result[key];
+                slider.value = val;
+                display.textContent = val;
+            }
+        });
+    }
+
+    // Slider Event Listener
     slider.addEventListener('input', () => {
         const val = slider.value;
         display.textContent = val;
-        updateVolume(tab.id, val);
-        updateIcon(val);
+        updateVolume(currentTab.id, val);
     });
 
-    // Reset button
-    resetBtn.addEventListener('click', () => {
-        slider.value = 100;
-        display.textContent = 100;
-        updateVolume(tab.id, 100);
-        updateIcon(100);
-    });
+    // Populate "Other Audio Tabs"
+    populateAudioTabs(currentTab.id);
+
+    // --- Functions ---
 
     function updateVolume(tabId, value) {
         // Save state
@@ -42,16 +52,48 @@ document.addEventListener('DOMContentLoaded', async () => {
             action: "setVolume",
             value: parseInt(value)
         }).catch(err => {
-            // Content script might not be loaded yet or injected
-            // We can try to inject it dynamically if it's not there, but manifest "content_scripts" handles mostly.
-            // However, for already open tabs, we might need to reload or inject.
-            // For now, we assume it's loaded.
-            console.log("Could not send message (content script might not be ready):", err);
+            // Ignore errors if content script not ready
+            console.log("Error sending message:", err);
         });
     }
-    
-    function updateIcon(value) {
-        // Optional: Update badge or icon if implementing dynamic icon
-        // For MVP, we just rely on UI
+
+    async function populateAudioTabs(currentTabId) {
+        // Find all tabs that are audible
+        const tabs = await chrome.tabs.query({ audible: true });
+
+        // Filter out current tab (since it's already main control)
+        const otherTabs = tabs.filter(t => t.id !== currentTabId);
+
+        if (otherTabs.length === 0) {
+            noAudioMsg.style.display = 'block';
+            return;
+        }
+
+        noAudioMsg.style.display = 'none';
+
+        otherTabs.forEach(tab => {
+            const li = document.createElement('li');
+            li.className = 'tab-item';
+
+            // Layout: [Favicon] [Title] [Vol % - optional feature for later]
+            const img = document.createElement('img');
+            img.className = 'favicon';
+            img.src = tab.favIconUrl || '';
+
+            const span = document.createElement('span');
+            span.className = 'tab-title';
+            span.textContent = tab.title;
+
+            li.appendChild(img);
+            li.appendChild(span);
+
+            // Click -> Switch to tab
+            li.addEventListener('click', () => {
+                chrome.tabs.update(tab.id, { active: true });
+                chrome.windows.update(tab.windowId, { focused: true });
+            });
+
+            audioTabsList.appendChild(li);
+        });
     }
 });

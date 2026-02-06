@@ -71,7 +71,7 @@ function updateGain(valuePercent) {
     // Clamp value
     let target = valuePercent / 100;
     if (target > MAX_GAIN) target = MAX_GAIN;
-    if (target < 1.0) target = 1.0;
+    if (target < 0) target = 0;
 
     // Apply smooth transition
     gainNode.gain.setTargetAtTime(target, audioContext.currentTime, 0.1);
@@ -133,7 +133,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.command === "volume-up") {
             newVal = Math.min(currentVal + 10, 600);
         } else if (request.command === "volume-down") {
-            newVal = Math.max(currentVal - 10, 100);
+            newVal = Math.max(currentVal - 10, 0);
         } else if (request.command === "volume-reset") {
             newVal = 100;
         }

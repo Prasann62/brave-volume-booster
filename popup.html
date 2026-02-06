@@ -1,26 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volume Booster</title>
     <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Volume Booster</h1>
-        </div>
-        
-        <div class="control-group">
-            <div class="value-display">
-                <span id="volumeValue">100</span>%
+    <div class="app-container">
+        <!-- Current Tab Info -->
+        <div class="current-tab-section">
+            <div class="tab-info">
+                <img id="currentFavicon" src="" alt="" class="favicon">
+                <span id="currentTitle" class="tab-title">Current Tab</span>
             </div>
-            <input type="range" id="volumeSlider" min="100" max="600" value="100" step="10">
+            <div class="volume-control">
+                <div class="percentage-display">
+                    <span id="volumeValue">100</span>%
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="volumeSlider" min="0" max="600" value="100" step="1">
+                </div>
+                <div class="slider-labels">
+                    <span>0%</span>
+                    <span>100%</span>
+                    <span>600%</span>
+                </div>
+            </div>
         </div>
 
-        <button id="resetBtn">Reset</button>
+        <hr class="divider">
+
+        <!-- Audio Tabs List -->
+        <div class="audio-tabs-section">
+            <h3>Tabs playing audio</h3>
+            <ul id="audioTabsList" class="tabs-list">
+                <!-- List items will be injected here -->
+                <!-- <li class="tab-item">
+                    <img src="favicon.png" class="favicon">
+                    <span class="tab-title">YouTube</span>
+                    <span class="volume-indicator">100%</span>
+                </li> -->
+            </ul>
+            <div id="noAudioMsg" class="no-audio-msg" style="display: none;">No other tabs playing audio</div>
+        </div>
     </div>
     <script src="popup.js"></script>
 </body>
+
 </html>

@@ -1,92 +1,168 @@
+:root {
+    --primary-color: #2b7de9;
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --secondary-text: #666666;
+    --divider-color: #eeeeee;
+    --hover-bg: #f5f5f5;
+    --slider-track: #e0e0e0;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #202124;
+        --text-color: #e8eaed;
+        --secondary-text: #9aa0a6;
+        --divider-color: #3c4043;
+        --hover-bg: #303134;
+        --slider-track: #5f6368;
+    }
+}
+
 body {
-    background-color: #0f172a;
-    color: #e5e7eb;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    width: 300px;
-    height: auto;
+    width: 320px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.app-container {
+    padding: 16px;
+}
+
+.current-tab-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tab-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.favicon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.tab-title {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-color);
 }
 
-.container {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+.volume-control {
+    text-align: center;
 }
 
-.header h1 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-    color: #f8fafc;
+.percentage-display {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 12px;
 }
 
-.control-group {
+.slider-container {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-
-.value-display {
-    font-size: 48px;
-    font-weight: 700;
-    color: #22c55e;
-    text-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
 }
 
 input[type=range] {
     -webkit-appearance: none;
     width: 100%;
-    height: 8px;
-    background: #334155;
-    border-radius: 4px;
+    height: 6px;
+    background: var(--slider-track);
+    border-radius: 3px;
     outline: none;
-    transition: background 0.2s;
+    cursor: pointer;
 }
 
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
     border-radius: 50%;
-    background: #22c55e;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-    transition: transform 0.1s ease;
+    transition: transform 0.1s;
 }
 
 input[type=range]::-webkit-slider-thumb:hover {
     transform: scale(1.1);
 }
 
-input[type=range]:active::-webkit-slider-thumb {
-    transform: scale(0.95);
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--secondary-text);
+    margin-top: 5px;
 }
 
-button {
-    background: #1e293b;
-    border: 1px solid #334155;
-    color: #94a3b8;
-    padding: 8px 16px;
+.divider {
+    border: 0;
+    border-top: 1px solid var(--divider-color);
+    margin: 16px 0;
+}
+
+.audio-tabs-section h3 {
+    font-size: 13px;
+    color: var(--secondary-text);
+    margin: 0 0 10px 0;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tabs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-    width: 100%;
+    transition: background-color 0.2s;
 }
 
-button:hover {
-    background: #334155;
-    color: #f1f5f9;
-    border-color: #475569;
+.tab-item:hover {
+    background-color: var(--hover-bg);
 }
 
-button:active {
-    transform: translateY(1px);
+.tab-item .favicon {
+    margin-right: 10px;
+}
+
+.tab-item .tab-title {
+    flex-grow: 1;
+    font-size: 13px;
+}
+
+.tab-item .volume-indicator {
+    font-size: 12px;
+    color: var(--secondary-text);
+    background: var(--hover-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.no-audio-msg {
+    font-size: 13px;
+    color: var(--secondary-text);
+    font-style: italic;
+    text-align: center;
+    margin-top: 10px;
 }
