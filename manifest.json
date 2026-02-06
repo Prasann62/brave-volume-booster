@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Volume Booster for Brave",
-  "version": "1.0",
-  "description": "Boost audio volume up to 600% on any website.",
+  "version": "1.1",
+  "description": "Boost audio volume up to 600% on any website with Web Audio API.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -11,6 +11,9 @@
   "host_permissions": [
     "<all_urls>"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html"
   },
@@ -24,5 +27,28 @@
       ],
       "run_at": "document_end"
     }
-  ]
+  ],
+  "commands": {
+    "volume-up": {
+      "suggested_key": {
+        "default": "Alt+Up",
+        "mac": "Alt+Up"
+      },
+      "description": "Increase volume"
+    },
+    "volume-down": {
+      "suggested_key": {
+        "default": "Alt+Down",
+        "mac": "Alt+Down"
+      },
+      "description": "Decrease volume"
+    },
+    "volume-reset": {
+      "suggested_key": {
+        "default": "Alt+Shift+0",
+        "mac": "Alt+Shift+0"
+      },
+      "description": "Reset volume to 100%"
+    }
+  }
 }
