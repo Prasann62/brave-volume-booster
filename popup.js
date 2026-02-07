@@ -41,6 +41,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Populate "Other Audio Tabs"
     populateAudioTabs(currentTab.id);
 
+    // --- Button Event Listeners ---
+    document.getElementById('btnDecrease').addEventListener('click', () => {
+        let val = parseInt(slider.value);
+        val = Math.max(0, val - 10);
+        updateUIAndVolume(val);
+    });
+
+    document.getElementById('btnIncrease').addEventListener('click', () => {
+        let val = parseInt(slider.value);
+        val = Math.min(600, val + 10);
+        updateUIAndVolume(val);
+    });
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+        updateUIAndVolume(100);
+    });
+
+    function updateUIAndVolume(val) {
+        slider.value = val;
+        display.textContent = val;
+        updateVolume(currentTab.id, val);
+    }
+
     // --- Functions ---
 
     function updateVolume(tabId, value) {

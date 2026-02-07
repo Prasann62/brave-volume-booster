@@ -166,3 +166,38 @@ input[type=range]::-webkit-slider-thumb:hover {
     text-align: center;
     margin-top: 10px;
 }
+
+/* Control Buttons */
+.control-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.control-btn {
+    background-color: var(--hover-bg);
+    border: 1px solid var(--divider-color);
+    color: var(--text-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.reset-btn {
+    font-size: 13px;
+    padding: 8px 12px;
+}
