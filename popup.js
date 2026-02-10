@@ -10,6 +10,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get current tab
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
+    // Check if we have a valid tab and if it's not a restricted URL
+    const isRestrictedUrl = (url) => {
+        if (!url) return true;
+        return url.startsWith('chrome://') ||
+            url.startsWith('brave://') ||
+            url.startsWith('edge://') ||
+            url.startsWith('chrome-extension://') ||
+            url.startsWith('about:');
+    };
+
     // Initialize Current Tab Info
     if (currentTab) {
         currentTitle.textContent = currentTab.title;
@@ -18,6 +28,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             // Placeholder or transparent
             currentFavicon.style.opacity = '0';
+        }
+
+        // Check if this is a restricted page
+        if (isRestrictedUrl(currentTab.url)) {
+            // Show error message
+            display.textContent = '--';
+            currentTitle.textContent = 'Restricted Page';
+            noAudioMsg.textContent = 'Volume Booster cannot run on this page (chrome://, brave://, or extension pages)';
+            noAudioMsg.style.display = 'block';
+            noAudioMsg.style.color = '#ff6b6b';
+            noAudioMsg.style.fontWeight = '500';
+
+            // Disable controls
+            slider.disabled = true;
+            document.getElementById('btnDecrease').disabled = true;
+            document.getElementById('btnIncrease').disabled = true;
+            document.getElementById('btnReset').disabled = true;
+
+            slider.style.opacity = '0.3';
+            slider.style.cursor = 'not-allowed';
+            return;
         }
 
         // Load saved volume
@@ -29,17 +60,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 display.textContent = val;
             }
         });
+    } else {
+        // No tab available
+        currentTitle.textContent = 'No Tab Available';
+        display.textContent = '--';
+        noAudioMsg.textContent = 'Could not access current tab';
+        noAudioMsg.style.display = 'block';
+        slider.disabled = true;
+        return;
     }
 
     // Slider Event Listener
     slider.addEventListener('input', () => {
+        if (!currentTab) return;
         const val = slider.value;
         display.textContent = val;
         updateVolume(currentTab.id, val);
     });
 
     // Populate "Other Audio Tabs"
-    populateAudioTabs(currentTab.id);
+    if (currentTab && !isRestrictedUrl(currentTab.url)) {
+        populateAudioTabs(currentTab.id);
+    }
 
     // --- Button Event Listeners ---
     document.getElementById('btnDecrease').addEventListener('click', () => {

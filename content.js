@@ -76,7 +76,7 @@ function updateGain(valuePercent) {
     // Apply smooth transition
     gainNode.gain.setTargetAtTime(target, audioContext.currentTime, 0.1);
 
-    // Resume if suspended (common in Brave/Chrome to duplicate power)
+    // Resume if suspended (common in Brave/Chrome to conserve power)
     if (audioContext.state === 'suspended') {
         audioContext.resume();
     }
