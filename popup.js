@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentTitle = document.getElementById('currentTitle');
     const audioTabsList = document.getElementById('audioTabsList');
     const noAudioMsg = document.getElementById('noAudioMsg');
+    const visualizer = document.getElementById('visualizer');
+    const canvasContext = visualizer.getContext('2d');
 
     // Get current tab
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -45,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('btnDecrease').disabled = true;
             document.getElementById('btnIncrease').disabled = true;
             document.getElementById('btnReset').disabled = true;
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.disabled = true);
 
             slider.style.opacity = '0.3';
             slider.style.cursor = 'not-allowed';
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const val = result[key];
                 slider.value = val;
                 display.textContent = val;
+                updatePresetButtons(val);
             }
         });
     } else {
@@ -70,12 +74,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // --- Audio Visualizer ---
+    let animationId;
+    function drawVisualizer(value) {
+        const width = visualizer.width;
+        const height = visualizer.height;
+        const barWidth = 4;
+        const gap = 2;
+        const numBars = Math.floor(width / (barWidth + gap));
+        const volumePercent = value / 600; // Normalize to 0-1
+
+        // Clear canvas
+        canvasContext.clearRect(0, 0, width, height);
+
+        // Draw bars
+        for (let i = 0; i < numBars; i++) {
+            const barHeight = Math.random() * height * volumePercent * 0.8 + height * 0.1;
+            const x = i * (barWidth + gap);
+            const y = (height - barHeight) / 2;
+
+            // Gradient
+            const gradient = canvasContext.createLinearGradient(0, y, 0, y + barHeight);
+            gradient.addColorStop(0, 'rgba(43, 125, 233, 0.8)');
+            gradient.addColorStop(1, 'rgba(43, 125, 233, 0.3)');
+
+            canvasContext.fillStyle = gradient;
+            canvasContext.fillRect(x, y, barWidth, barHeight);
+        }
+    }
+
+    function startVisualizer() {
+        if (animationId) cancelAnimationFrame(animationId);
+
+        function animate() {
+            drawVisualizer(parseInt(slider.value));
+            animationId = requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // Start visualizer
+    startVisualizer();
+
     // Slider Event Listener
     slider.addEventListener('input', () => {
         if (!currentTab) return;
         const val = slider.value;
         display.textContent = val;
         updateVolume(currentTab.id, val);
+        updatePresetButtons(val);
     });
 
     // Populate "Other Audio Tabs"
@@ -100,10 +147,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateUIAndVolume(100);
     });
 
+    // --- Preset Buttons ---
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const volume = parseInt(btn.dataset.volume);
+            updateUIAndVolume(volume);
+        });
+    });
+
+    function updatePresetButtons(value) {
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            if (parseInt(btn.dataset.volume) === parseInt(value)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    // --- Settings: Export/Import ---
+    document.getElementById('btnExport').addEventListener('click', async () => {
+        const settings = await chrome.storage.local.get(null);
+        const dataStr = JSON.stringify(settings, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `volume-booster-settings-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btnImport').addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+    });
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const settings = JSON.parse(event.target.result);
+                chrome.storage.local.set(settings, () => {
+                    alert('Settings imported successfully! Please refresh the page.');
+                    // Reload current volume
+                    const key = `volume_${currentTab.id}`;
+                    if (settings[key]) {
+                        updateUIAndVolume(settings[key]);
+                    }
+                });
+            } catch (err) {
+                alert('Error importing settings: Invalid JSON file');
+            }
+        };
+        reader.readAsText(file);
+    });
+
     function updateUIAndVolume(val) {
         slider.value = val;
         display.textContent = val;
         updateVolume(currentTab.id, val);
+        updatePresetButtons(val);
     }
 
     // --- Functions ---
