@@ -1,37 +1,55 @@
-# 🔊 Volume Booster for Brave/Chrome
+# 🎵 Audio Enhancer Pro for Brave/Chrome
 
-A powerful, open-source browser extension that boosts audio volume up to **600%** on any website using the Web Audio API. Features real-time audio visualization, quick presets, and comprehensive keyboard shortcuts.
+A professional, open-source browser extension that transforms audio playback with a **10-band equalizer**, **audio presets**, **spectrum analyzer**, and volume boost up to **600%**. Powered by the Web Audio API.
 
-![Volume Booster](icon.svg)
+![Audio Enhancer Pro](icon.svg)
 
 ## ✨ Features
 
-### 🎚️ Advanced Volume Control
+### 🎚️ 10-Band Graphic Equalizer
+- **Professional EQ**: Adjust 10 frequency bands from 31Hz to 16kHz
+- **Per-band control**: -12dB to +12dB range for each frequency
+- **Real-time adjustments**: Smooth transitions with no audio gaps
+- **Frequency bands**: 31Hz, 62Hz, 125Hz, 250Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 16kHz
+
+### 🎵 Audio Presets
+- **Flat**: No EQ modification (reference)
+- **Bass Boost**: Enhanced low frequencies for deep bass
+- **Vocal Enhance**: Clear vocals and mid-range focus
+- **Clear Speech**: Optimized for podcasts and audiobooks
+- **Treble Boost**: Bright, crisp high frequencies
+- **V-Shape**: Bass and treble emphasis (popular for music)
+- **Bass**: Maximum bass power
+- **Electronic**: Perfect for EDM and electronic music
+
+### 📊 Real-Time Spectrum Analyzer
+- Visual frequency spectrum display
+- 60 FPS smooth animation
+- Color-coded frequency visualization
+- Live audio analysis
+
+### 🔊 Advanced Volume Control
 - **Boost up to 600%**: Increase volume beyond browser limits
-- **Per-tab control**: Each tab maintains its own volume level
-- **Quick presets**: One-click access to 100%, 200%, 400%, and 600% volume
+- **Per-tab control**: Each tab maintains its own settings
+- **Quick presets**: One-click access to 100%, 200%, 400%, and 600%
 - **Fine-tune control**: Precise slider with ±10% adjustment buttons
 
-### 🎵 Audio Visualizer
-- Real-time frequency bars showing audio activity
-- Dynamic visualization that responds to volume changes
-- Smooth animations using Canvas API
+### 🎨 Modern Tabbed Interface
+- **Volume Tab**: Main volume controls with visualizer
+- **Equalizer Tab**: 10-band EQ with spectrum analyzer
+- **Presets Tab**: Quick access to audio enhancement modes
+- **Settings Tab**: Export/import, shortcuts, and configuration
 
 ### ⌨️ Keyboard Shortcuts
 - `Alt + ↑` - Increase volume by 10%
 - `Alt + ↓` - Decrease volume by 10%
 - `Alt + Shift + 0` - Reset to 100%
 
-### 🎨 Modern UI
-- Clean, minimalist design with SVG icons
-- Automatic dark/light mode based on system preferences
-- Smooth animations and transitions
-- Accessibility-friendly with ARIA labels
-
 ### 💾 Settings Management
-- **Export settings**: Save your volume preferences as JSON
+- **Export settings**: Save your entire configuration as JSON
 - **Import settings**: Restore settings from backup
-- Persistent storage across sessions
+- **Persistent storage**: Volume and EQ settings saved per tab
+- **Custom presets**: Save your own EQ configurations
 
 ### 🔧 Audio Tabs Management
 - View all tabs currently playing audio
@@ -47,42 +65,54 @@ A powerful, open-source browser extension that boosts audio volume up to **600%*
 4. Click "Load unpacked"
 5. Select the `volume-booster` folder
 
-### Manual Installation
-1. Download the latest release
-2. Unzip the file
-3. Follow steps 2-5 from "From Source"
-
 ## 📖 Usage
 
-### Basic Volume Control
+### Volume Control
 1. Click the extension icon in your browser toolbar
-2. Use the slider or preset buttons to adjust volume
+2. Adjust volume with the slider or preset buttons
 3. Your settings are automatically saved per tab
 
+### Equalizer
+1. Switch to the **Equalizer** tab
+2. Drag individual frequency sliders to customize sound
+3. Watch the real-time spectrum analyzer
+4. Click **Reset** to restore flat EQ
+
+### Audio Presets
+1. Switch to the **Presets** tab
+2. Click any preset card to apply it instantly
+3. The EQ will update to match the preset
+4. Active preset is highlighted
+
 ### Keyboard Shortcuts
-Press the keyboard combinations anywhere in the browser to control volume:
+Press combinations anywhere in the browser:
 - **Increase**: `Alt + ↑`
 - **Decrease**: `Alt + ↓`
 - **Reset**: `Alt + Shift + 0`
 
-### Export/Import Settings
-1. Click **Export** to save your current settings
-2. Click **Import** to restore settings from a JSON file
-3. Settings include all tab volumes and preferences
-
 ## 🛠️ Technical Details
 
 ### Built With
-- **Web Audio API**: Core audio processing
-- **Canvas API**: Real-time visualizer
+- **Web Audio API**: Professional audio processing
+- **Canvas API**: Real-time visualizations
 - **Chrome Extensions API**: Tab management and storage
-- **Vanilla JavaScript**: No external dependencies
+- **Vanilla JavaScript**: Zero external dependencies
 
-### Audio Processing
-- Uses `GainNode` for volume amplification
-- `DynamicsCompressor` prevents audio clipping
-- Smooth transitions with `setTargetAtTime()`
-- Maximum gain: 6.0 (600%)
+### Audio Processing Chain
+```
+MediaElement → Gain → EQ (10 bands) → Compressor → Analyzer → Destination
+```
+
+### EQ Implementation
+- **Filter Type**: Biquad peaking filters
+- **Q Factor**: 1.0 (standard for graphic EQ)
+- **Range**: -12dB to +12dB per band
+- **Frequencies**: 31, 62, 125, 250, 500, 1k, 2k, 4k, 8k, 16k Hz
+
+### Spectrum Analyzer
+- **FFT Size**: 2048 (high resolution)
+- **Smoothing**: 0.8 for smooth visualization
+- **Update Rate**: 60 FPS
 
 ### Browser Compatibility
 - ✅ Brave Browser
@@ -93,7 +123,7 @@ Press the keyboard combinations anywhere in the browser to control volume:
 ### Permissions
 - `activeTab`: Access current tab audio
 - `scripting`: Inject content scripts
-- `storage`: Save volume preferences
+- `storage`: Save volume and EQ preferences
 - `tabs`: Manage tab information
 - `<all_urls>`: Work on any website
 
@@ -104,6 +134,7 @@ Works on any website with audio/video content:
 - ✅ Spotify, SoundCloud, Bandcamp
 - ✅ Netflix, Prime Video, Disney+
 - ✅ Twitter, Facebook, Instagram
+- ✅ Podcasts, audiobooks, web radio
 - ✅ Any HTML5 audio/video player
 
 ### Restrictions
@@ -111,7 +142,6 @@ Cannot run on browser internal pages:
 - ❌ `chrome://` pages
 - ❌ `brave://` pages
 - ❌ Extension management pages
-- ❌ Browser settings pages
 
 ## 🔒 Privacy
 
@@ -122,37 +152,40 @@ Cannot run on browser internal pages:
 
 ## 🐛 Troubleshooting
 
+### EQ not working?
+1. Refresh the webpage
+2. Ensure audio is playing
+3. Try applying a preset first
+
+### Spectrum analyzer not updating?
+- The analyzer requires active audio playback
+- Switch to the Equalizer tab to activate it
+
 ### Volume not changing?
 1. Refresh the webpage
 2. Check if audio is playing
-3. Verify the extension has permissions
-
-### Visualizer not working?
-- The visualizer shows activity based on volume level
-- If no audio is playing, bars may be minimal
-
-### Keyboard shortcuts not working?
-1. Check if another extension is using the same shortcuts
-2. Try clicking on the webpage first to focus it
-3. Verify shortcuts in `chrome://extensions/shortcuts`
+3. Verify extension has permissions
 
 ## 📝 Changelog
 
-### Version 1.2.0 (Latest)
+### Version 2.0.0 (Major Update - Latest)
+- ✨ **NEW**: 10-band graphic equalizer (31Hz - 16kHz)
+- ✨ **NEW**: 8 professional audio presets
+- ✨ **NEW**: Real-time spectrum analyzer
+- ✨ **NEW**: Tabbed interface (Volume, Equalizer, Presets, Settings)
+- ✨ **NEW**: Per-tab EQ and volume persistence
+- ✨ **NEW**: Custom EQ preset saving
+- 🎨 Redesigned modern UI with improved accessibility
+- ⚡ Enhanced audio processing pipeline
+- 📊 Advanced frequency visualization
+
+### Version 1.2.0
 - ➕ Added audio visualizer with Canvas API
 - ➕ Implemented volume presets (100%, 200%, 400%, 600%)
-- ➕ Modern SVG icons for better UX
+- ➕ Modern SVG icons
 - ➕ Settings export/import functionality
 - ➕ Keyboard shortcuts reference panel
 - ➕ Enhanced accessibility with ARIA labels
-- ➕ Smooth animations and transitions
-- 🔧 Improved UI responsiveness
-
-### Version 1.1.0
-- ➕ Added keyboard shortcuts
-- ➕ Per-tab volume control
-- ➕ Audio tabs list
-- 🔧 Improved audio processing
 
 ### Version 1.0.0
 - 🎉 Initial release
@@ -167,12 +200,6 @@ Contributions are welcome! This is an open-source project.
 2. Make your changes
 3. Test thoroughly in Brave/Chrome
 4. Submit a pull request
-
-### Code Style
-- Use ES6+ JavaScript
-- Follow existing code formatting
-- Add comments for complex logic
-- Test on multiple websites
 
 ## 📄 License
 

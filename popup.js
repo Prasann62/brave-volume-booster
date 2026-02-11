@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // UI Elements
+    // ========== UI ELEMENTS ==========
+    // Volume Tab
     const slider = document.getElementById('volumeSlider');
     const display = document.getElementById('volumeValue');
     const currentFavicon = document.getElementById('currentFavicon');
@@ -9,10 +10,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     const visualizer = document.getElementById('visualizer');
     const canvasContext = visualizer.getContext('2d');
 
+    // Equalizer Tab
+    const eqSliders = Array.from({ length: 10 }, (_, i) => document.getElementById(`eq${i}`));
+    const spectrumCanvas = document.getElementById('spectrumCanvas');
+    const spectrumContext = spectrumCanvas ? spectrumCanvas.getContext('2d') : null;
+
+    // Tab Navigation
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
     // Get current tab
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    // Check if we have a valid tab and if it's not a restricted URL
+    // ========== TAB NAVIGATION ==========
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+
+            // Update active states
+            tabButtons.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Start spectrum analyzer if on equalizer tab
+            if (tabName === 'equalizer') {
+                startSpectrumAnalyzer();
+            }
+        });
+    });
+
+    // ========== HELPER FUNCTIONS ==========
     const isRestrictedUrl = (url) => {
         if (!url) return true;
         return url.startsWith('chrome://') ||
@@ -22,32 +51,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             url.startsWith('about:');
     };
 
-    // Initialize Current Tab Info
+    // ========== INITIALIZE CURRENT TAB ==========
     if (currentTab) {
         currentTitle.textContent = currentTab.title;
         if (currentTab.favIconUrl) {
             currentFavicon.src = currentTab.favIconUrl;
         } else {
-            // Placeholder or transparent
             currentFavicon.style.opacity = '0';
         }
 
-        // Check if this is a restricted page
+        // Check if restricted page
         if (isRestrictedUrl(currentTab.url)) {
-            // Show error message
             display.textContent = '--';
             currentTitle.textContent = 'Restricted Page';
-            noAudioMsg.textContent = 'Volume Booster cannot run on this page (chrome://, brave://, or extension pages)';
+            noAudioMsg.textContent = 'Audio Enhancer cannot run on this page (chrome://, brave://, or extension pages)';
             noAudioMsg.style.display = 'block';
             noAudioMsg.style.color = '#ff6b6b';
             noAudioMsg.style.fontWeight = '500';
 
-            // Disable controls
+            // Disable all controls
             slider.disabled = true;
             document.getElementById('btnDecrease').disabled = true;
             document.getElementById('btnIncrease').disabled = true;
             document.getElementById('btnReset').disabled = true;
+            document.getElementById('btnResetEq').disabled = true;
             document.querySelectorAll('.preset-btn').forEach(btn => btn.disabled = true);
+            document.querySelectorAll('.preset-card').forEach(card => card.style.opacity = '0.5');
+            eqSliders.forEach(slider => slider.disabled = true);
 
             slider.style.opacity = '0.3';
             slider.style.cursor = 'not-allowed';
@@ -64,8 +94,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updatePresetButtons(val);
             }
         });
+
+        // Load saved EQ state
+        loadEqState();
+
     } else {
-        // No tab available
         currentTitle.textContent = 'No Tab Available';
         display.textContent = '--';
         noAudioMsg.textContent = 'Could not access current tab';
@@ -74,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // --- Audio Visualizer ---
+    // ========== VOLUME VISUALIZER ==========
     let animationId;
     function drawVisualizer(value) {
         const width = visualizer.width;
@@ -82,18 +115,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const barWidth = 4;
         const gap = 2;
         const numBars = Math.floor(width / (barWidth + gap));
-        const volumePercent = value / 600; // Normalize to 0-1
+        const volumePercent = value / 600;
 
-        // Clear canvas
         canvasContext.clearRect(0, 0, width, height);
 
-        // Draw bars
         for (let i = 0; i < numBars; i++) {
             const barHeight = Math.random() * height * volumePercent * 0.8 + height * 0.1;
             const x = i * (barWidth + gap);
             const y = (height - barHeight) / 2;
 
-            // Gradient
             const gradient = canvasContext.createLinearGradient(0, y, 0, y + barHeight);
             gradient.addColorStop(0, 'rgba(43, 125, 233, 0.8)');
             gradient.addColorStop(1, 'rgba(43, 125, 233, 0.3)');
@@ -113,10 +143,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         animate();
     }
 
-    // Start visualizer
     startVisualizer();
 
-    // Slider Event Listener
+    // ========== VOLUME CONTROLS ==========
     slider.addEventListener('input', () => {
         if (!currentTab) return;
         const val = slider.value;
@@ -125,12 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePresetButtons(val);
     });
 
-    // Populate "Other Audio Tabs"
-    if (currentTab && !isRestrictedUrl(currentTab.url)) {
-        populateAudioTabs(currentTab.id);
-    }
-
-    // --- Button Event Listeners ---
     document.getElementById('btnDecrease').addEventListener('click', () => {
         let val = parseInt(slider.value);
         val = Math.max(0, val - 10);
@@ -147,7 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateUIAndVolume(100);
     });
 
-    // --- Preset Buttons ---
     document.querySelectorAll('.preset-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const volume = parseInt(btn.dataset.volume);
@@ -165,7 +187,222 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- Settings: Export/Import ---
+    function updateUIAndVolume(val) {
+        slider.value = val;
+        display.textContent = val;
+        updateVolume(currentTab.id, val);
+        updatePresetButtons(val);
+    }
+
+    function updateVolume(tabId, value) {
+        chrome.storage.local.set({ [`volume_${tabId}`]: value });
+        chrome.tabs.sendMessage(tabId, {
+            action: "setVolume",
+            value: parseInt(value)
+        }).catch(err => {
+            console.log("Error sending message:", err);
+        });
+    }
+
+    // ========== EQUALIZER CONTROLS ==========
+    eqSliders.forEach((slider, index) => {
+        const valueDisplay = slider.parentElement.querySelector('.eq-value');
+
+        slider.addEventListener('input', () => {
+            const gain = parseFloat(slider.value);
+            valueDisplay.textContent = `${gain > 0 ? '+' : ''}${gain.toFixed(1)}dB`;
+
+            // Send to content script
+            chrome.tabs.sendMessage(currentTab.id, {
+                action: "setEqBand",
+                index: index,
+                gain: gain
+            }).catch(err => console.log("EQ update error:", err));
+
+            // Save to storage
+            saveEqState();
+        });
+    });
+
+    document.getElementById('btnResetEq').addEventListener('click', () => {
+        chrome.tabs.sendMessage(currentTab.id, {
+            action: "resetEq"
+        }).catch(err => console.log("Reset EQ error:", err));
+
+        // Reset UI
+        eqSliders.forEach((slider, index) => {
+            slider.value = 0;
+            const valueDisplay = slider.parentElement.querySelector('.eq-value');
+            valueDisplay.textContent = '0dB';
+        });
+
+        // Reset preset selection
+        document.querySelectorAll('.preset-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        document.querySelector('[data-preset="flat"]')?.classList.add('active');
+
+        saveEqState();
+    });
+
+    function loadEqState() {
+        chrome.storage.local.get([`eq_${currentTab.id}`, `eqPreset_${currentTab.id}`], (result) => {
+            const eqValues = result[`eq_${currentTab.id}`] || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            const preset = result[`eqPreset_${currentTab.id}`] || 'flat';
+
+            // Update sliders
+            eqSliders.forEach((slider, index) => {
+                slider.value = eqValues[index];
+                const valueDisplay = slider.parentElement.querySelector('.eq-value');
+                const val = eqValues[index];
+                valueDisplay.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}dB`;
+            });
+
+            // Update preset card
+            document.querySelectorAll('.preset-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-preset="${preset}"]`)?.classList.add('active');
+        });
+    }
+
+    function saveEqState() {
+        const eqValues = eqSliders.map(s => parseFloat(s.value));
+        chrome.storage.local.set({
+            [`eq_${currentTab.id}`]: eqValues,
+            [`eqPreset_${currentTab.id}`]: 'custom'
+        });
+    }
+
+    // ========== SPECTRUM ANALYZER ==========
+    let spectrumAnimationId;
+
+    function drawSpectrum(dataArray) {
+        if (!spectrumContext || !dataArray) return;
+
+        const width = spectrumCanvas.width;
+        const height = spectrumCanvas.height;
+        const barWidth = 4;
+        const gap = 1;
+        const numBars = Math.floor(width / (barWidth + gap));
+
+        spectrumContext.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < numBars; i++) {
+            const dataIndex = Math.floor(i * dataArray.length / numBars);
+            const value = dataArray[dataIndex] / 255;
+            const barHeight = value * height * 0.9;
+            const x = i * (barWidth + gap);
+            const y = height - barHeight;
+
+            // Gradient based on frequency
+            const hue = (i / numBars) * 120 + 200; // Blue to cyan
+            const gradient = spectrumContext.createLinearGradient(0, y, 0, height);
+            gradient.addColorStop(0, `hsla(${hue}, 70%, 60%, 0.9)`);
+            gradient.addColorStop(1, `hsla(${hue}, 70%, 60%, 0.3)`);
+
+            spectrumContext.fillStyle = gradient;
+            spectrumContext.fillRect(x, y, barWidth, barHeight);
+        }
+    }
+
+    function startSpectrumAnalyzer() {
+        if (spectrumAnimationId) return; // Already running
+
+        function animate() {
+            chrome.tabs.sendMessage(currentTab.id, {
+                action: "getSpectrumData"
+            }).then(response => {
+                if (response && response.spectrumData) {
+                    drawSpectrum(new Uint8Array(response.spectrumData));
+                }
+            }).catch(() => {
+                // Ignore errors
+            });
+
+            spectrumAnimationId = requestAnimationFrame(animate);
+        }
+
+        animate();
+    }
+
+    // ========== AUDIO PRESETS ==========
+    document.querySelectorAll('.preset-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const preset = card.dataset.preset;
+
+            // Apply preset
+            chrome.tabs.sendMessage(currentTab.id, {
+                action: "applyPreset",
+                preset: preset
+            }).then(() => {
+                // Get the preset values and update UI
+                chrome.tabs.sendMessage(currentTab.id, {
+                    action: "getEqState"
+                }).then(response => {
+                    if (response && response.eqValues) {
+                        eqSliders.forEach((slider, index) => {
+                            slider.value = response.eqValues[index];
+                            const valueDisplay = slider.parentElement.querySelector('.eq-value');
+                            const val = response.eqValues[index];
+                            valueDisplay.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}dB`;
+                        });
+                    }
+                }).catch(err => console.log("Get EQ state error:", err));
+            }).catch(err => console.log("Apply preset error:", err));
+
+            // Update active state
+            document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            // Save preset selection
+            chrome.storage.local.set({
+                [`eqPreset_${currentTab.id}`]: preset
+            });
+        });
+    });
+
+    // ========== AUDIO TABS LIST ==========
+    async function populateAudioTabs(currentTabId) {
+        const tabs = await chrome.tabs.query({ audible: true });
+        const otherTabs = tabs.filter(t => t.id !== currentTabId);
+
+        if (otherTabs.length === 0) {
+            noAudioMsg.style.display = 'block';
+            return;
+        }
+
+        noAudioMsg.style.display = 'none';
+
+        otherTabs.forEach(tab => {
+            const li = document.createElement('li');
+            li.className = 'tab-item';
+
+            const img = document.createElement('img');
+            img.className = 'favicon';
+            img.src = tab.favIconUrl || '';
+
+            const span = document.createElement('span');
+            span.className = 'tab-title';
+            span.textContent = tab.title;
+
+            li.appendChild(img);
+            li.appendChild(span);
+
+            li.addEventListener('click', () => {
+                chrome.tabs.update(tab.id, { active: true });
+                chrome.windows.update(tab.windowId, { focused: true });
+            });
+
+            audioTabsList.appendChild(li);
+        });
+    }
+
+    if (currentTab && !isRestrictedUrl(currentTab.url)) {
+        populateAudioTabs(currentTab.id);
+    }
+
+    // ========== SETTINGS: EXPORT/IMPORT ==========
     document.getElementById('btnExport').addEventListener('click', async () => {
         const settings = await chrome.storage.local.get(null);
         const dataStr = JSON.stringify(settings, null, 2);
@@ -174,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = `volume-booster-settings-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `audio-enhancer-settings-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
     });
@@ -193,11 +430,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const settings = JSON.parse(event.target.result);
                 chrome.storage.local.set(settings, () => {
                     alert('Settings imported successfully! Please refresh the page.');
-                    // Reload current volume
                     const key = `volume_${currentTab.id}`;
                     if (settings[key]) {
                         updateUIAndVolume(settings[key]);
                     }
+                    loadEqState();
                 });
             } catch (err) {
                 alert('Error importing settings: Invalid JSON file');
@@ -205,67 +442,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         reader.readAsText(file);
     });
-
-    function updateUIAndVolume(val) {
-        slider.value = val;
-        display.textContent = val;
-        updateVolume(currentTab.id, val);
-        updatePresetButtons(val);
-    }
-
-    // --- Functions ---
-
-    function updateVolume(tabId, value) {
-        // Save state
-        chrome.storage.local.set({ [`volume_${tabId}`]: value });
-
-        // Send message to content script
-        chrome.tabs.sendMessage(tabId, {
-            action: "setVolume",
-            value: parseInt(value)
-        }).catch(err => {
-            // Ignore errors if content script not ready
-            console.log("Error sending message:", err);
-        });
-    }
-
-    async function populateAudioTabs(currentTabId) {
-        // Find all tabs that are audible
-        const tabs = await chrome.tabs.query({ audible: true });
-
-        // Filter out current tab (since it's already main control)
-        const otherTabs = tabs.filter(t => t.id !== currentTabId);
-
-        if (otherTabs.length === 0) {
-            noAudioMsg.style.display = 'block';
-            return;
-        }
-
-        noAudioMsg.style.display = 'none';
-
-        otherTabs.forEach(tab => {
-            const li = document.createElement('li');
-            li.className = 'tab-item';
-
-            // Layout: [Favicon] [Title] [Vol % - optional feature for later]
-            const img = document.createElement('img');
-            img.className = 'favicon';
-            img.src = tab.favIconUrl || '';
-
-            const span = document.createElement('span');
-            span.className = 'tab-title';
-            span.textContent = tab.title;
-
-            li.appendChild(img);
-            li.appendChild(span);
-
-            // Click -> Switch to tab
-            li.addEventListener('click', () => {
-                chrome.tabs.update(tab.id, { active: true });
-                chrome.windows.update(tab.windowId, { focused: true });
-            });
-
-            audioTabsList.appendChild(li);
-        });
-    }
 });

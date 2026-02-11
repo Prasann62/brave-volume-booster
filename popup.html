@@ -4,144 +4,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volume Booster</title>
+    <title>Audio Enhancer Pro</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
     <div class="app-container">
-        <!-- Current Tab Info -->
-        <div class="current-tab-section">
-            <div class="tab-info">
-                <img id="currentFavicon" src="" alt="" class="favicon">
-                <span id="currentTitle" class="tab-title">Current Tab</span>
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="volume">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+                </svg>
+                <span>Volume</span>
+            </button>
+            <button class="tab-btn" data-tab="equalizer">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z" />
+                </svg>
+                <span>Equalizer</span>
+            </button>
+            <button class="tab-btn" data-tab="presets">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+                <span>Presets</span>
+            </button>
+            <button class="tab-btn" data-tab="settings">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+                </svg>
+                <span>Settings</span>
+            </button>
+        </div>
+
+        <!-- Tab Content: Volume -->
+        <div class="tab-content active" id="tab-volume">
+            <div class="current-tab-section">
+                <div class="tab-info">
+                    <img id="currentFavicon" src="" alt="" class="favicon">
+                    <span id="currentTitle" class="tab-title">Current Tab</span>
+                </div>
+                <div class="volume-control">
+                    <div class="percentage-display">
+                        <span id="volumeValue">100</span>%
+                    </div>
+
+                    <!-- Audio Visualizer -->
+                    <div class="visualizer-container">
+                        <canvas id="visualizer" width="288" height="60"></canvas>
+                    </div>
+
+                    <div class="slider-container">
+                        <input type="range" id="volumeSlider" min="0" max="600" value="100" step="1"
+                            aria-label="Volume slider">
+                    </div>
+                    <div class="slider-labels">
+                        <span>0%</span>
+                        <span>100%</span>
+                        <span>600%</span>
+                    </div>
+
+                    <!-- Volume Presets -->
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-volume="100" title="Normal (100%)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+                            </svg>
+                            <span>Normal</span>
+                        </button>
+                        <button class="preset-btn" data-volume="200" title="Boost (200%)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                            </svg>
+                            <span>Boost</span>
+                        </button>
+                        <button class="preset-btn" data-volume="400" title="High (400%)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                            </svg>
+                            <span>High</span>
+                        </button>
+                        <button class="preset-btn" data-volume="600" title="Max (600%)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                            </svg>
+                            <span>Max</span>
+                        </button>
+                    </div>
+
+                    <div class="control-buttons">
+                        <button id="btnDecrease" class="control-btn icon-btn" title="Decrease Volume (-10%)"
+                            aria-label="Decrease volume">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 9v6h4l5 5V4l-5 5H7z" />
+                            </svg>
+                        </button>
+                        <button id="btnReset" class="control-btn reset-btn icon-btn" title="Reset to 100%"
+                            aria-label="Reset to 100%">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+                            </svg>
+                        </button>
+                        <button id="btnIncrease" class="control-btn icon-btn" title="Increase Volume (+10%)"
+                            aria-label="Increase volume">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="volume-control">
-                <div class="percentage-display">
-                    <span id="volumeValue">100</span>%
-                </div>
 
-                <!-- Audio Visualizer -->
-                <div class="visualizer-container">
-                    <canvas id="visualizer" width="288" height="60"></canvas>
-                </div>
+            <hr class="divider">
 
-                <div class="slider-container">
-                    <input type="range" id="volumeSlider" min="0" max="600" value="100" step="1"
-                        aria-label="Volume slider">
-                </div>
-                <div class="slider-labels">
-                    <span>0%</span>
-                    <span>100%</span>
-                    <span>600%</span>
-                </div>
+            <!-- Audio Tabs List -->
+            <div class="audio-tabs-section">
+                <h3>Tabs playing audio</h3>
+                <ul id="audioTabsList" class="tabs-list">
+                    <!-- List items will be injected here -->
+                </ul>
+                <div id="noAudioMsg" class="no-audio-msg" style="display: none;">No other tabs playing audio</div>
+            </div>
+        </div>
 
-                <!-- Volume Presets -->
-                <div class="preset-buttons">
-                    <button class="preset-btn" data-volume="100" title="Normal (100%)">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
-                        </svg>
-                        <span>Normal</span>
-                    </button>
-                    <button class="preset-btn" data-volume="200" title="Boost (200%)">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                        </svg>
-                        <span>Boost</span>
-                    </button>
-                    <button class="preset-btn" data-volume="400" title="High (400%)">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                        </svg>
-                        <span>High</span>
-                    </button>
-                    <button class="preset-btn" data-volume="600" title="Max (600%)">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                        </svg>
-                        <span>Max</span>
-                    </button>
-                </div>
+        <!-- Tab Content: Equalizer -->
+        <div class="tab-content" id="tab-equalizer">
+            <div class="eq-header">
+                <h2>10-Band Equalizer</h2>
+                <button id="btnResetEq" class="eq-reset-btn">Reset</button>
+            </div>
 
-                <div class="control-buttons">
-                    <button id="btnDecrease" class="control-btn icon-btn" title="Decrease Volume (-10%)"
-                        aria-label="Decrease volume">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 9v6h4l5 5V4l-5 5H7z" />
-                        </svg>
-                    </button>
-                    <button id="btnReset" class="control-btn reset-btn icon-btn" title="Reset to 100%"
-                        aria-label="Reset to 100%">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
-                        </svg>
-                    </button>
-                    <button id="btnIncrease" class="control-btn icon-btn" title="Increase Volume (+10%)"
-                        aria-label="Increase volume">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                        </svg>
-                    </button>
+            <!-- Spectrum Analyzer -->
+            <div class="spectrum-container">
+                <canvas id="spectrumCanvas" width="288" height="80"></canvas>
+            </div>
+
+            <!-- Equalizer Sliders -->
+            <div class="eq-container">
+                <div class="eq-band" data-freq="31">
+                    <input type="range" class="eq-slider" id="eq0" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">31Hz</div>
+                </div>
+                <div class="eq-band" data-freq="62">
+                    <input type="range" class="eq-slider" id="eq1" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">62Hz</div>
+                </div>
+                <div class="eq-band" data-freq="125">
+                    <input type="range" class="eq-slider" id="eq2" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">125Hz</div>
+                </div>
+                <div class="eq-band" data-freq="250">
+                    <input type="range" class="eq-slider" id="eq3" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">250Hz</div>
+                </div>
+                <div class="eq-band" data-freq="500">
+                    <input type="range" class="eq-slider" id="eq4" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">500Hz</div>
+                </div>
+                <div class="eq-band" data-freq="1000">
+                    <input type="range" class="eq-slider" id="eq5" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">1kHz</div>
+                </div>
+                <div class="eq-band" data-freq="2000">
+                    <input type="range" class="eq-slider" id="eq6" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">2kHz</div>
+                </div>
+                <div class="eq-band" data-freq="4000">
+                    <input type="range" class="eq-slider" id="eq7" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">4kHz</div>
+                </div>
+                <div class="eq-band" data-freq="8000">
+                    <input type="range" class="eq-slider" id="eq8" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">8kHz</div>
+                </div>
+                <div class="eq-band" data-freq="16000">
+                    <input type="range" class="eq-slider" id="eq9" min="-12" max="12" value="0" step="0.5"
+                        orient="vertical">
+                    <div class="eq-value">0dB</div>
+                    <div class="eq-label">16kHz</div>
                 </div>
             </div>
         </div>
 
-        <hr class="divider">
+        <!-- Tab Content: Presets -->
+        <div class="tab-content" id="tab-presets">
+            <h2>Audio Presets</h2>
+            <p class="presets-description">Choose a preset or customize your own equalizer settings</p>
 
-        <!-- Audio Tabs List -->
-        <div class="audio-tabs-section">
-            <h3>Tabs playing audio</h3>
-            <ul id="audioTabsList" class="tabs-list">
-                <!-- List items will be injected here -->
-            </ul>
-            <div id="noAudioMsg" class="no-audio-msg" style="display: none;">No other tabs playing audio</div>
-        </div>
-
-        <hr class="divider">
-
-        <!-- Keyboard Shortcuts -->
-        <details class="shortcuts-section">
-            <summary>⌨️ Keyboard Shortcuts</summary>
-            <div class="shortcuts-list">
-                <div class="shortcut-item">
-                    <span class="shortcut-key">Alt + ↑</span>
-                    <span class="shortcut-desc">Increase volume</span>
+            <div class="presets-grid">
+                <div class="preset-card" data-preset="flat">
+                    <div class="preset-icon">🎵</div>
+                    <h3>Flat</h3>
+                    <p>No EQ modification</p>
                 </div>
-                <div class="shortcut-item">
-                    <span class="shortcut-key">Alt + ↓</span>
-                    <span class="shortcut-desc">Decrease volume</span>
+                <div class="preset-card" data-preset="bassBoost">
+                    <div class="preset-icon">🔊</div>
+                    <h3>Bass Boost</h3>
+                    <p>Enhanced low frequencies</p>
                 </div>
-                <div class="shortcut-item">
-                    <span class="shortcut-key">Alt + Shift + 0</span>
-                    <span class="shortcut-desc">Reset to 100%</span>
+                <div class="preset-card" data-preset="vocalEnhance">
+                    <div class="preset-icon">🎤</div>
+                    <h3>Vocal Enhance</h3>
+                    <p>Clear vocals & mid-range</p>
+                </div>
+                <div class="preset-card" data-preset="clearSpeech">
+                    <div class="preset-icon">💬</div>
+                    <h3>Clear Speech</h3>
+                    <p>Optimized for podcasts</p>
+                </div>
+                <div class="preset-card" data-preset="trebleBoost">
+                    <div class="preset-icon">✨</div>
+                    <h3>Treble Boost</h3>
+                    <p>Bright, crisp highs</p>
+                </div>
+                <div class="preset-card" data-preset="vShape">
+                    <div class="preset-icon">📊</div>
+                    <h3>V-Shape</h3>
+                    <p>Bass & treble emphasis</p>
+                </div>
+                <div class="preset-card" data-preset="bass">
+                    <div class="preset-icon">🎸</div>
+                    <h3>Bass</h3>
+                    <p>Maximum bass power</p>
+                </div>
+                <div class="preset-card" data-preset="electronic">
+                    <div class="preset-icon">🎧</div>
+                    <h3>Electronic</h3>
+                    <p>Perfect for EDM</p>
                 </div>
             </div>
-        </details>
+        </div>
 
-        <!-- Settings Section -->
-        <div class="settings-section">
-            <button id="btnExport" class="settings-btn" title="Export Settings">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />
-                </svg>
-                Export
-            </button>
-            <button id="btnImport" class="settings-btn" title="Import Settings">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6-.67l-2.59 2.58L9 12.5l5-5 5 5-1.41 1.41L13 11.33V21h-2z" />
-                </svg>
-                Import
-            </button>
-            <input type="file" id="fileInput" accept=".json" style="display: none;">
+        <!-- Tab Content: Settings -->
+        <div class="tab-content" id="tab-settings">
+            <h2>Settings</h2>
+
+            <!-- Keyboard Shortcuts -->
+            <details class="shortcuts-section" open>
+                <summary>⌨️ Keyboard Shortcuts</summary>
+                <div class="shortcuts-list">
+                    <div class="shortcut-item">
+                        <span class="shortcut-key">Alt + ↑</span>
+                        <span class="shortcut-desc">Increase volume</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-key">Alt + ↓</span>
+                        <span class="shortcut-desc">Decrease volume</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-key">Alt + Shift + 0</span>
+                        <span class="shortcut-desc">Reset to 100%</span>
+                    </div>
+                </div>
+            </details>
+
+            <hr class="divider">
+
+            <!-- Import/Export -->
+            <div class="settings-group">
+                <h3>Backup & Restore</h3>
+                <div class="settings-section">
+                    <button id="btnExport" class="settings-btn" title="Export Settings">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />
+                        </svg>
+                        Export Settings
+                    </button>
+                    <button id="btnImport" class="settings-btn" title="Import Settings">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6-.67l-2.59 2.58L9 12.5l5-5 5 5-1.41 1.41L13 11.33V21h-2z" />
+                        </svg>
+                        Import Settings
+                    </button>
+                    <input type="file" id="fileInput" accept=".json" style="display: none;">
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- About -->
+            <div class="about-section">
+                <h3>About</h3>
+                <p><strong>Audio Enhancer Pro</strong> v2.0</p>
+                <p>Professional audio enhancement with 10-band equalizer, presets, and spectrum analyzer.</p>
+                <p class="credits">Powered by Web Audio API</p>
+            </div>
         </div>
     </div>
     <script src="popup.js"></script>
