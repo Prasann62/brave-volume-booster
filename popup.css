@@ -430,6 +430,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 .eq-slider {
     -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
     writing-mode: bt-lr;
     width: 6px;
     height: 120px;
@@ -689,4 +690,75 @@ button:disabled:hover {
 
 .app-container::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
+}
+
+/* ========== TOGGLE SWITCH ========== */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--slider-track);
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-color);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--primary-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+/* ========== DEBUG PANEL ========== */
+.debug-panel {
+    background-color: var(--hover-bg) !important;
+    border: 1px solid var(--divider-color);
+    margin-top: 12px !important;
+}
+
+.debug-stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--secondary-text);
+}
+
+.debug-stat span:last-child {
+    color: var(--primary-color);
+    font-weight: 600;
 }

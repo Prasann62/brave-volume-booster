@@ -30,6 +30,13 @@
                 </svg>
                 <span>Presets</span>
             </button>
+            <button class="tab-btn" data-tab="environments">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" />
+                </svg>
+                <span>Env</span>
+            </button>
             <button class="tab-btn" data-tab="settings">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path
@@ -253,10 +260,46 @@
                     <h3>Bass</h3>
                     <p>Maximum bass power</p>
                 </div>
+
+
                 <div class="preset-card" data-preset="electronic">
                     <div class="preset-icon">🎧</div>
                     <h3>Electronic</h3>
                     <p>Perfect for EDM</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Environments -->
+        <div class="tab-content" id="tab-environments">
+            <h2>Spatial Environments</h2>
+            <p class="presets-description">Simulate different physical spaces</p>
+
+            <div class="presets-grid">
+                <div class="preset-card env-card active" data-env="studio">
+                    <div class="preset-icon">🎙️</div>
+                    <h3>Studio</h3>
+                    <p>Dry, no reverb</p>
+                </div>
+                <div class="preset-card env-card" data-env="small_room">
+                    <div class="preset-icon">🏠</div>
+                    <h3>Small Room</h3>
+                    <p>Tight ambience</p>
+                </div>
+                <div class="preset-card env-card" data-env="large_hall">
+                    <div class="preset-icon">🏛️</div>
+                    <h3>Large Hall</h3>
+                    <p>Spacious reverb</p>
+                </div>
+                <div class="preset-card env-card" data-env="cathedral">
+                    <div class="preset-icon">⛪</div>
+                    <h3>Cathedral</h3>
+                    <p>Grand eco</p>
+                </div>
+                <div class="preset-card env-card" data-env="outer_space">
+                    <div class="preset-icon">🌌</div>
+                    <h3>Space</h3>
+                    <p>Infinite decay</p>
                 </div>
             </div>
         </div>
@@ -305,6 +348,35 @@
                         Import Settings
                     </button>
                     <input type="file" id="fileInput" accept=".json" style="display: none;">
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Debug Mode -->
+            <div class="settings-group">
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label for="debugToggle" class="setting-label" style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 500;">🐞 Debug Mode</span>
+                        <small style="opacity: 0.7;">Show professional audio graph stats</small>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="debugToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div id="debugPanel" class="debug-panel"
+                    style="display: none; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 12px;">
+                    <h4 style="margin-top: 0; margin-bottom: 8px; color: var(--primary-color);">Audio Graph Stats</h4>
+                    <div class="debug-stat"><span>State:</span> <span id="dbgState">-</span></div>
+                    <div class="debug-stat"><span>Sample Rate:</span> <span id="dbgRate">-</span></div>
+                    <div class="debug-stat"><span>Active Nodes:</span> <span id="dbgNodes">-</span></div>
+                    <div class="debug-stat"><span>Env:</span> <span id="dbgEnv">-</span></div>
+                    <button id="btnRefreshDebug" class="debug-btn"
+                        style="margin-top: 8px; width: 100%; padding: 4px; background: var(--primary-color); border: none; border-radius: 4px; color: white; cursor: pointer;">Refresh
+                        Stats</button>
                 </div>
             </div>
 

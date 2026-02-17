@@ -22,6 +22,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get current tab
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
+    // Environment & Debug Elements
+    const envCards = document.querySelectorAll('.env-card');
+    const debugToggle = document.getElementById('debugToggle');
+    const debugPanel = document.getElementById('debugPanel');
+    const btnRefreshDebug = document.getElementById('btnRefreshDebug');
+
+    // Debug Stats Elements
+    const dbgState = document.getElementById('dbgState');
+    const dbgRate = document.getElementById('dbgRate');
+    const dbgNodes = document.getElementById('dbgNodes');
+    const dbgEnv = document.getElementById('dbgEnv');
+
     // ========== TAB NAVIGATION ==========
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -97,6 +109,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Load saved EQ state
         loadEqState();
+
+        // Load saved Environment state
+        loadEnvironmentState();
+
+        // Load Debug state
+        loadDebugState();
+
 
     } else {
         currentTitle.textContent = 'No Tab Available';
@@ -327,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ========== AUDIO PRESETS ==========
-    document.querySelectorAll('.preset-card').forEach(card => {
+    document.querySelectorAll('.preset-card[data-preset]').forEach(card => {
         card.addEventListener('click', () => {
             const preset = card.dataset.preset;
 
@@ -361,6 +380,100 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
     });
+
+    // ========== SPATIAL ENVIRONMENTS ==========
+    envCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const envName = card.dataset.env;
+
+            // Send to content script
+            chrome.tabs.sendMessage(currentTab.id, {
+                action: "setEnvironment",
+                name: envName
+            }).catch(err => console.log("Set Env error:", err));
+
+            // Update UI
+            envCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            // Save state
+            chrome.storage.local.set({ [`env_${currentTab.id}`]: envName });
+        });
+    });
+
+    function loadEnvironmentState() {
+        chrome.storage.local.get([`env_${currentTab.id}`], (result) => {
+            const env = result[`env_${currentTab.id}`] || 'studio';
+            envCards.forEach(c => {
+                if (c.dataset.env === env) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+        });
+    }
+
+    // ========== DEBUG MODE ==========
+    let debugPollInterval;
+
+    debugToggle.addEventListener('change', () => {
+        const isEnabled = debugToggle.checked;
+        debugPanel.style.display = isEnabled ? 'block' : 'none';
+
+        chrome.storage.local.set({ [`debug_${currentTab.id}`]: isEnabled });
+
+        chrome.tabs.sendMessage(currentTab.id, {
+            action: "setDebugMode",
+            enabled: isEnabled
+        }).catch(() => { });
+
+        if (isEnabled) {
+            startDebugPolling();
+        } else {
+            stopDebugPolling();
+        }
+    });
+
+    btnRefreshDebug.addEventListener('click', updateDebugStats);
+
+    function startDebugPolling() {
+        if (debugPollInterval) clearInterval(debugPollInterval);
+        updateDebugStats();
+        debugPollInterval = setInterval(updateDebugStats, 1000);
+    }
+
+    function stopDebugPolling() {
+        if (debugPollInterval) clearInterval(debugPollInterval);
+    }
+
+    function updateDebugStats() {
+        chrome.tabs.sendMessage(currentTab.id, {
+            action: "getDebugStats"
+        }).then(stats => {
+            if (!stats) return;
+            dbgState.textContent = stats.state;
+            dbgRate.textContent = `${stats.sampleRate} Hz`;
+            dbgNodes.textContent = stats.nodes;
+            dbgEnv.textContent = stats.environment;
+        }).catch(() => {
+            dbgState.textContent = "Error/Disconnected";
+        });
+    }
+
+    function loadDebugState() {
+        chrome.storage.local.get([`debug_${currentTab.id}`], (result) => {
+            const isEnabled = !!result[`debug_${currentTab.id}`];
+            debugToggle.checked = isEnabled;
+            debugPanel.style.display = isEnabled ? 'block' : 'none';
+
+            if (isEnabled) {
+                // Sync content script state
+                chrome.tabs.sendMessage(currentTab.id, {
+                    action: "setDebugMode",
+                    enabled: true
+                }).catch(() => { });
+                startDebugPolling();
+            }
+        });
+    }
 
     // ========== AUDIO TABS LIST ==========
     async function populateAudioTabs(currentTabId) {
