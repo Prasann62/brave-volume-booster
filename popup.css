@@ -527,3 +527,140 @@ input:checked+.slider:before {
 .debug-stat span:first-child {
     color: #fff;
 }
+
+/* ========== VOLUME CIRCLE WRAPPER (Mute) ========== */
+.volume-circle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.mute-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.mute-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    display: block;
+}
+
+.mute-btn:hover {
+    background: rgba(0, 242, 255, 0.15);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 0 12px rgba(0, 242, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.mute-btn.muted {
+    background: rgba(255, 60, 60, 0.2);
+    border-color: #ff3c3c;
+    color: #ff3c3c;
+    box-shadow: 0 0 14px rgba(255, 60, 60, 0.4);
+    animation: mutePulse 2s ease-in-out infinite;
+}
+
+@keyframes mutePulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 14px rgba(255, 60, 60, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 22px rgba(255, 60, 60, 0.7);
+    }
+}
+
+/* ========== FEATURE PANELS (Pan & Sleep) ========== */
+.feature-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.feature-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.feature-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-shadow: 0 0 8px rgba(0, 242, 255, 0.5);
+    min-width: 55px;
+    text-align: right;
+}
+
+.mini-reset-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: all 0.2s;
+}
+
+.mini-reset-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* ========== SLEEP TIMER BUTTONS ========== */
+.sleep-timer-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.sleep-btn {
+    flex: 1;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sleep-btn:hover {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+    background: rgba(188, 19, 254, 0.12);
+}
+
+.sleep-btn.active {
+    background: rgba(188, 19, 254, 0.2);
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+    box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+}

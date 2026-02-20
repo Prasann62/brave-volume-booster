@@ -11,6 +11,7 @@ class AudioEnhancer {
         this.compressor = null;
         this.analyser = null;
         this.convolver = null;
+        this.panNode = null;
         this.eqBands = [];
         this.connectedElements = new WeakSet();
         this.initialized = false;
@@ -83,6 +84,10 @@ class AudioEnhancer {
             return filter;
         });
 
+        // Stereo Panner
+        this.panNode = this.audioContext.createStereoPanner();
+        this.panNode.pan.value = 0;
+
         // Reverb (Convolver) setup
         // We need a Dry/Wet mix.
         // Source -> Gain -> EQ -> Split -> [Dry Gain] -> Compressor -> Destination
@@ -119,13 +124,16 @@ class AudioEnhancer {
         }
         const lastEqBand = this.eqBands[this.eqBands.length - 1];
 
+        // 1b. EQ -> Pan
+        lastEqBand.connect(this.panNode);
+
         // 2. Split to Dry and Wet paths
         // Dry Path
-        lastEqBand.connect(this.dryGain);
+        this.panNode.connect(this.dryGain);
         this.dryGain.connect(this.compressor);
 
         // Wet Path (Reverb)
-        lastEqBand.connect(this.convolver);
+        this.panNode.connect(this.convolver);
         this.convolver.connect(this.wetGain);
         this.wetGain.connect(this.compressor);
 
@@ -321,6 +329,12 @@ class AudioEnhancer {
                 break;
             case 'setEnvironment':
                 this.setEnvironment(request.name);
+                break;
+            case 'setPan':
+                if (this.panNode && this.audioContext) {
+                    const panVal = Math.max(-1, Math.min(1, request.value));
+                    this.panNode.pan.setTargetAtTime(panVal, this.audioContext.currentTime, 0.05);
+                }
                 break;
             case 'getSpectrumData':
                 sendResponse({ spectrumData: this.getSpectrum() });

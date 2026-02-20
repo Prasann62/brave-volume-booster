@@ -10,6 +10,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const visualizer = document.getElementById('visualizer');
     const canvasContext = visualizer.getContext('2d');
 
+    // New Feature Elements
+    const btnMute = document.getElementById('btnMute');
+    const muteIconOn = document.getElementById('muteIconOn');
+    const muteIconOff = document.getElementById('muteIconOff');
+    const panSlider = document.getElementById('panSlider');
+    const panValue = document.getElementById('panValue');
+    const btnResetPan = document.getElementById('btnResetPan');
+    const sleepTimerCountdown = document.getElementById('sleepTimerCountdown');
+    const btnCancelTimer = document.getElementById('btnCancelTimer');
+
     // Equalizer Tab
     const eqSliders = Array.from({ length: 10 }, (_, i) => document.getElementById(`eq${i}`));
     const spectrumCanvas = document.getElementById('spectrumCanvas');
@@ -90,6 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.querySelectorAll('.preset-btn').forEach(btn => btn.disabled = true);
             document.querySelectorAll('.preset-card').forEach(card => card.style.opacity = '0.5');
             eqSliders.forEach(slider => slider.disabled = true);
+            if (btnMute) btnMute.disabled = true;
+            if (panSlider) panSlider.disabled = true;
+            document.querySelectorAll('.sleep-btn').forEach(b => b.disabled = true);
 
             slider.style.opacity = '0.3';
             slider.style.cursor = 'not-allowed';
@@ -115,6 +128,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Load Debug state
         loadDebugState();
+
+        // Load new feature states
+        loadMuteState();
+        loadPanState();
+        loadSleepTimerState();
 
 
     } else {
@@ -513,6 +531,138 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (currentTab && !isRestrictedUrl(currentTab.url)) {
         populateAudioTabs(currentTab.id);
+    }
+
+    // ========== MUTE TOGGLE ==========
+    let isMuted = false;
+    let volumeBeforeMute = 100;
+
+    function setMuteUI(muted) {
+        isMuted = muted;
+        btnMute.classList.toggle('muted', muted);
+        muteIconOn.style.display = muted ? 'none' : 'block';
+        muteIconOff.style.display = muted ? 'block' : 'none';
+        btnMute.title = muted ? 'Unmute' : 'Mute';
+    }
+
+    btnMute.addEventListener('click', () => {
+        if (!currentTab) return;
+        if (!isMuted) {
+            volumeBeforeMute = parseInt(slider.value);
+            setMuteUI(true);
+            chrome.tabs.sendMessage(currentTab.id, { action: 'setVolume', value: 0 }).catch(() => { });
+        } else {
+            setMuteUI(false);
+            updateUIAndVolume(volumeBeforeMute);
+        }
+        chrome.storage.local.set({ [`muted_${currentTab.id}`]: isMuted, [`muteVol_${currentTab.id}`]: volumeBeforeMute });
+    });
+
+    function loadMuteState() {
+        chrome.storage.local.get([`muted_${currentTab.id}`, `muteVol_${currentTab.id}`], (result) => {
+            const wasMuted = !!result[`muted_${currentTab.id}`];
+            volumeBeforeMute = result[`muteVol_${currentTab.id}`] || 100;
+            if (wasMuted) {
+                setMuteUI(true);
+                chrome.tabs.sendMessage(currentTab.id, { action: 'setVolume', value: 0 }).catch(() => { });
+            } else {
+                setMuteUI(false);
+            }
+        });
+    }
+
+    // ========== STEREO PAN ==========
+    function formatPan(val) {
+        if (Math.abs(val) < 0.01) return 'Center';
+        const pct = Math.round(Math.abs(val) * 100);
+        return val < 0 ? `L ${pct}%` : `R ${pct}%`;
+    }
+
+    panSlider.addEventListener('input', () => {
+        const val = parseFloat(panSlider.value);
+        panValue.textContent = formatPan(val);
+        chrome.tabs.sendMessage(currentTab.id, { action: 'setPan', value: val }).catch(() => { });
+        chrome.storage.local.set({ [`pan_${currentTab.id}`]: val });
+    });
+
+    btnResetPan.addEventListener('click', () => {
+        panSlider.value = 0;
+        panValue.textContent = 'Center';
+        chrome.tabs.sendMessage(currentTab.id, { action: 'setPan', value: 0 }).catch(() => { });
+        chrome.storage.local.set({ [`pan_${currentTab.id}`]: 0 });
+    });
+
+    function loadPanState() {
+        chrome.storage.local.get([`pan_${currentTab.id}`], (result) => {
+            const val = result[`pan_${currentTab.id}`] ?? 0;
+            panSlider.value = val;
+            panValue.textContent = formatPan(val);
+            chrome.tabs.sendMessage(currentTab.id, { action: 'setPan', value: val }).catch(() => { });
+        });
+    }
+
+    // ========== SLEEP TIMER ==========
+    let sleepTimerInterval = null;
+    let sleepEndTime = null;
+
+    function startSleepTimer(minutes) {
+        clearSleepTimer();
+        sleepEndTime = Date.now() + minutes * 60 * 1000;
+        chrome.storage.local.set({ sleep_end: sleepEndTime });
+        btnCancelTimer.style.display = 'block';
+        updateSleepCountdown();
+        sleepTimerInterval = setInterval(updateSleepCountdown, 1000);
+        document.querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.sleep-btn[data-minutes="${minutes}"]`)?.classList.add('active');
+    }
+
+    function clearSleepTimer() {
+        if (sleepTimerInterval) clearInterval(sleepTimerInterval);
+        sleepTimerInterval = null;
+        sleepEndTime = null;
+        sleepTimerCountdown.textContent = '';
+        btnCancelTimer.style.display = 'none';
+        document.querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('active'));
+        chrome.storage.local.remove('sleep_end');
+    }
+
+    function updateSleepCountdown() {
+        if (!sleepEndTime) return;
+        const remaining = sleepEndTime - Date.now();
+        if (remaining <= 0) {
+            clearSleepTimer();
+            setMuteUI(true);
+            chrome.tabs.sendMessage(currentTab.id, { action: 'setVolume', value: 0 }).catch(() => { });
+            chrome.storage.local.set({ [`muted_${currentTab.id}`]: true });
+            sleepTimerCountdown.textContent = 'Muted!';
+            setTimeout(() => sleepTimerCountdown.textContent = '', 3000);
+            return;
+        }
+        const m = Math.floor(remaining / 60000);
+        const s = Math.floor((remaining % 60000) / 1000);
+        sleepTimerCountdown.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    document.querySelectorAll('.sleep-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const minutes = parseInt(btn.dataset.minutes);
+            startSleepTimer(minutes);
+        });
+    });
+
+    btnCancelTimer.addEventListener('click', () => {
+        clearSleepTimer();
+    });
+
+    function loadSleepTimerState() {
+        chrome.storage.local.get(['sleep_end'], (result) => {
+            if (result.sleep_end && result.sleep_end > Date.now()) {
+                sleepEndTime = result.sleep_end;
+                btnCancelTimer.style.display = 'block';
+                updateSleepCountdown();
+                sleepTimerInterval = setInterval(updateSleepCountdown, 1000);
+            }
+        });
     }
 
     // ========== SETTINGS: EXPORT/IMPORT ==========
