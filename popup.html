@@ -153,6 +153,29 @@
                         <button id="btnCancelTimer" class="mini-reset-btn" style="display:none;">Cancel Timer</button>
                     </div>
 
+                    <!-- Playback Speed -->
+                    <div class="feature-panel speed-panel">
+                        <div class="feature-panel-header">
+                            <span>⚡ Playback Speed</span>
+                            <span id="speedValue" class="feature-value">1×</span>
+                        </div>
+                        <input type="range" id="speedSlider" min="0.25" max="4" value="1" step="0.05"
+                            aria-label="Playback speed">
+                        <div class="slider-labels">
+                            <span>0.25×</span>
+                            <span>1×</span>
+                            <span>4×</span>
+                        </div>
+                        <div class="speed-presets">
+                            <button class="speed-preset-btn active" data-speed="0.5">0.5×</button>
+                            <button class="speed-preset-btn active" data-speed="0.75">0.75×</button>
+                            <button class="speed-preset-btn active" data-speed="1">1×</button>
+                            <button class="speed-preset-btn" data-speed="1.25">1.25×</button>
+                            <button class="speed-preset-btn" data-speed="1.5">1.5×</button>
+                            <button class="speed-preset-btn" data-speed="2">2×</button>
+                        </div>
+                    </div>
+
                     <div class="control-buttons">
                         <button id="btnDecrease" class="control-btn icon-btn" title="Decrease Volume (-10%)"
                             aria-label="Decrease volume">

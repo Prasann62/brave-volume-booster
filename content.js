@@ -351,6 +351,12 @@ class AudioEnhancer {
             case 'setDebugMode':
                 this.isDebugMode = request.enabled;
                 break;
+            case 'setPlaybackSpeed':
+                // Apply to all media elements on the page directly
+                document.querySelectorAll('video, audio').forEach(el => {
+                    el.playbackRate = Math.max(0.25, Math.min(4, request.value));
+                });
+                break;
             case 'shortcut':
                 this.handleShortcut(request.command);
                 break;

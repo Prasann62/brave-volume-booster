@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnResetPan = document.getElementById('btnResetPan');
     const sleepTimerCountdown = document.getElementById('sleepTimerCountdown');
     const btnCancelTimer = document.getElementById('btnCancelTimer');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedValueEl = document.getElementById('speedValue');
 
     // Equalizer Tab
     const eqSliders = Array.from({ length: 10 }, (_, i) => document.getElementById(`eq${i}`));
@@ -103,6 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (btnMute) btnMute.disabled = true;
             if (panSlider) panSlider.disabled = true;
             document.querySelectorAll('.sleep-btn').forEach(b => b.disabled = true);
+            if (speedSlider) speedSlider.disabled = true;
+            document.querySelectorAll('.speed-preset-btn').forEach(b => b.disabled = true);
 
             slider.style.opacity = '0.3';
             slider.style.cursor = 'not-allowed';
@@ -133,6 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadMuteState();
         loadPanState();
         loadSleepTimerState();
+        loadSpeedState();
 
 
     } else {
@@ -662,6 +667,39 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateSleepCountdown();
                 sleepTimerInterval = setInterval(updateSleepCountdown, 1000);
             }
+        });
+    }
+
+    // ========== PLAYBACK SPEED ==========
+    function formatSpeed(val) {
+        return `${parseFloat(val).toFixed(2).replace(/\.?0+$/, '')}×`;
+    }
+
+    function updateSpeedPresetButtons(val) {
+        document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+            btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.speed) - val) < 0.01);
+        });
+    }
+
+    function applySpeed(val) {
+        val = Math.max(0.25, Math.min(4, val));
+        speedSlider.value = val;
+        speedValueEl.textContent = formatSpeed(val);
+        updateSpeedPresetButtons(val);
+        chrome.tabs.sendMessage(currentTab.id, { action: 'setPlaybackSpeed', value: val }).catch(() => { });
+        chrome.storage.local.set({ [`speed_${currentTab.id}`]: val });
+    }
+
+    speedSlider.addEventListener('input', () => applySpeed(parseFloat(speedSlider.value)));
+
+    document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => applySpeed(parseFloat(btn.dataset.speed)));
+    });
+
+    function loadSpeedState() {
+        chrome.storage.local.get([`speed_${currentTab.id}`], (result) => {
+            const val = result[`speed_${currentTab.id}`] ?? 1;
+            applySpeed(val);
         });
     }
 
