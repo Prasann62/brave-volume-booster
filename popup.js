@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 slider.value = val;
                 display.textContent = val;
                 updatePresetButtons(val);
+                updateGlowRing(parseInt(val));
             }
         });
 
@@ -194,6 +195,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         display.textContent = val;
         updateVolume(currentTab.id, val);
         updatePresetButtons(val);
+        updateGlowRing(parseInt(val));
+        triggerRipple();
     });
 
     document.getElementById('btnDecrease').addEventListener('click', () => {
@@ -234,6 +237,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         display.textContent = val;
         updateVolume(currentTab.id, val);
         updatePresetButtons(val);
+        updateGlowRing(val);
+        triggerRipple();
     }
 
     function updateVolume(tabId, value) {
@@ -245,6 +250,80 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log("Error sending message:", err);
         });
     }
+
+    // ========== WONDER: GLOW RING ==========
+    const volumeCircleEl = document.getElementById('volumeCircle');
+    function updateGlowRing(volumePercent) {
+        if (!volumeCircleEl) return;
+        const t = Math.min(1, volumePercent / 600);
+        // glow-intensity: 2px at 0%, 18px at 100%, 42px at 600%
+        const glow1 = (2 + t * 40).toFixed(1) + 'px';
+        const glow2 = (1 + t * 20).toFixed(1) + 'px';
+        const opacity = (0.25 + t * 0.75).toFixed(2);
+        volumeCircleEl.style.setProperty('--glow-intensity', glow1);
+        volumeCircleEl.style.setProperty('--glow-intensity2', glow2);
+        volumeCircleEl.style.setProperty('--ring-opacity', opacity);
+        // Also update the outer box-shadow glow on the circle itself
+        const cyan = `rgba(0,242,255,${(0.05 + t * 0.35).toFixed(2)})`;
+        const purple = `rgba(188,19,254,${(0.03 + t * 0.2).toFixed(2)})`;
+        volumeCircleEl.style.boxShadow = `0 0 ${(30 + t * 60).toFixed(0)}px ${cyan}, 0 0 ${(10 + t * 30).toFixed(0)}px ${purple}`;
+    }
+
+    // ========== WONDER: RIPPLE BURST ==========
+    const rippleEl = document.getElementById('volumeRipple');
+    let rippleTimeout;
+    function triggerRipple() {
+        if (!rippleEl) return;
+        rippleEl.classList.remove('burst');
+        void rippleEl.offsetWidth; // force reflow
+        rippleEl.classList.add('burst');
+        clearTimeout(rippleTimeout);
+        rippleTimeout = setTimeout(() => rippleEl.classList.remove('burst'), 650);
+    }
+
+    // ========== WONDER: AUDIO MOOD RING ==========
+    const moodRingEl = document.getElementById('moodRing');
+    const moodLabelEl = document.getElementById('moodLabel');
+    const moodIconEl = document.getElementById('moodIcon');
+
+    const MOOD_CLASSES = ['mood-bass', 'mood-crisp', 'mood-warm', 'mood-vocal', 'mood-space', 'mood-flat'];
+
+    const MOODS = [
+        { label: 'Deep & Thunderous', icon: '🔊', cls: 'mood-bass', match: eq => eq[0] > 4 || eq[1] > 4 },
+        { label: 'Punchy Bass', icon: '🎸', cls: 'mood-bass', match: eq => eq[0] > 1 && eq[2] < 2 },
+        { label: 'Crystal Clear', icon: '💎', cls: 'mood-crisp', match: eq => eq[7] > 3 || eq[8] > 3 || eq[9] > 3 },
+        { label: 'Vocal Spotlight', icon: '🎤', cls: 'mood-vocal', match: eq => eq[4] > 2 || eq[5] > 2 },
+        { label: 'Warm & Rich', icon: '☕', cls: 'mood-warm', match: eq => eq[2] > 1 && eq[3] > 0 && eq[7] < 2 },
+        { label: 'V-Shape Power', icon: '⚡', cls: 'mood-bass', match: eq => eq[0] > 2 && eq[9] > 2 },
+        { label: 'Deep Space', icon: '🌌', cls: 'mood-space', match: eq => eq[0] > 3 && eq[9] > 3 },
+        { label: 'Podcast Pro', icon: '🎙️', cls: 'mood-vocal', match: eq => eq[5] > 2 && eq[6] > 2 && eq[0] < 0 },
+        { label: 'Treble Shimmer', icon: '✨', cls: 'mood-crisp', match: eq => eq[8] > 3 && eq[9] > 3 },
+        { label: 'Balanced', icon: '🎵', cls: 'mood-flat', match: _ => true }, // fallback
+    ];
+
+    function analyzeEQ(eqValues) {
+        return MOODS.find(m => m.match(eqValues)) || MOODS[MOODS.length - 1];
+    }
+
+    function updateMoodRing(eqValues) {
+        if (!moodRingEl) return;
+        const mood = analyzeEQ(eqValues);
+
+        // Only animate if mood changed
+        if (moodLabelEl.textContent === mood.label) return;
+
+        moodLabelEl.textContent = mood.label;
+        moodIconEl.textContent = mood.icon;
+
+        // Swap mood class with pop-in animation
+        moodRingEl.classList.remove(...MOOD_CLASSES, 'mood-changed');
+        void moodRingEl.offsetWidth; // reflow
+        moodRingEl.classList.add(mood.cls, 'mood-changed');
+    }
+
+    // Initialize glow ring and mood ring at startup
+    updateGlowRing(100);
+    updateMoodRing([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
     // ========== EQUALIZER CONTROLS ==========
     eqSliders.forEach((slider, index) => {
@@ -263,6 +342,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Save to storage
             saveEqState();
+
+            // Update mood ring
+            updateMoodRing(eqSliders.map(s => parseFloat(s.value)));
         });
     });
 
@@ -285,6 +367,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('[data-preset="flat"]')?.classList.add('active');
 
         saveEqState();
+        updateMoodRing([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     });
 
     function loadEqState() {
@@ -389,6 +472,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             const val = response.eqValues[index];
                             valueDisplay.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}dB`;
                         });
+                        updateMoodRing(response.eqValues);
                     }
                 }).catch(err => console.log("Get EQ state error:", err));
             }).catch(err => console.log("Apply preset error:", err));

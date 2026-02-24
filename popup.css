@@ -700,3 +700,184 @@ input:checked+.slider:before {
     color: var(--primary-color);
     box-shadow: 0 0 10px rgba(0, 242, 255, 0.25);
 }
+
+/* ========== WONDER FEATURE 1: PULSING GLOW RING ========== */
+.volume-circle {
+    position: relative;
+}
+
+.pulse-ring-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border-radius: 50%;
+}
+
+.pulse-ring-circle {
+    stroke-opacity: var(--ring-opacity, 0.4);
+    filter: drop-shadow(0 0 calc(var(--glow-intensity, 4px)) var(--primary-color)) drop-shadow(0 0 calc(var(--glow-intensity2, 2px)) var(--secondary-color));
+    animation: ringPulse 2.4s ease-in-out infinite;
+    transform-origin: 70px 70px;
+    transform-box: fill-box;
+    stroke-dasharray: 415;
+    stroke-dashoffset: 0;
+}
+
+@keyframes ringPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        stroke-opacity: var(--ring-opacity, 0.4);
+    }
+
+    50% {
+        transform: scale(1.03);
+        stroke-opacity: calc(var(--ring-opacity, 0.4) * 1.8);
+    }
+}
+
+/* ========== WONDER FEATURE 2: RIPPLE BURST ========== */
+.volume-circle-wrapper {
+    position: relative;
+}
+
+.ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140px;
+    height: 140px;
+    margin-left: -70px;
+    margin-top: -70px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+}
+
+.ripple.burst {
+    animation: rippleBurst 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes rippleBurst {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+        box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.6),
+            0 0 0 0 rgba(188, 19, 254, 0.4);
+    }
+
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+        box-shadow: 0 0 0 24px rgba(0, 242, 255, 0),
+            0 0 0 36px rgba(188, 19, 254, 0);
+    }
+}
+
+/* ========== WONDER FEATURE 3: AUDIO MOOD RING ========== */
+.mood-ring {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    background-size: 200% 200%;
+    animation: moodGradientShift 4s ease infinite;
+    /* default mood gradient, overridden by JS */
+    background-image: linear-gradient(135deg, rgba(0, 242, 255, 0.15), rgba(188, 19, 254, 0.15));
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mood-ring:hover {
+    transform: scale(1.04);
+}
+
+.mood-icon {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mood-ring:hover .mood-icon {
+    transform: rotate(20deg) scale(1.2);
+}
+
+.mood-label {
+    color: var(--text-primary);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    transition: all 0.35s ease;
+}
+
+/* Mood-specific gradient themes */
+.mood-ring.mood-bass {
+    background-image: linear-gradient(135deg, rgba(188, 19, 254, 0.25), rgba(255, 50, 50, 0.2));
+    border-color: rgba(188, 19, 254, 0.4);
+}
+
+.mood-ring.mood-crisp {
+    background-image: linear-gradient(135deg, rgba(0, 242, 255, 0.25), rgba(0, 200, 180, 0.2));
+    border-color: rgba(0, 242, 255, 0.4);
+}
+
+.mood-ring.mood-warm {
+    background-image: linear-gradient(135deg, rgba(255, 160, 50, 0.25), rgba(255, 80, 80, 0.2));
+    border-color: rgba(255, 160, 50, 0.4);
+}
+
+.mood-ring.mood-vocal {
+    background-image: linear-gradient(135deg, rgba(80, 220, 130, 0.25), rgba(0, 180, 255, 0.2));
+    border-color: rgba(80, 220, 130, 0.4);
+}
+
+.mood-ring.mood-space {
+    background-image: linear-gradient(135deg, rgba(30, 0, 80, 0.5), rgba(188, 19, 254, 0.3));
+    border-color: rgba(120, 0, 200, 0.5);
+}
+
+.mood-ring.mood-flat {
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+@keyframes moodGradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Mood label pop-in */
+@keyframes moodPop {
+    0% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.mood-ring.mood-changed {
+    animation: moodGradientShift 4s ease infinite, moodPop 0.4s ease forwards;
+}
