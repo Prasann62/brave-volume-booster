@@ -1,120 +1,190 @@
+/* ====================================================
+   S.T.I.T.C.H - Audio Enhancer Pro Design System
+   ==================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 :root {
-    --bg-dark: #0f0c29;
-    --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    /* Void Palette */
+    --void-bg: #050505;
+    --glass-surface: rgba(20, 20, 20, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-bright: rgba(255, 255, 255, 0.15);
 
-    --primary-color: #00f2ff;
-    /* Neon Cyan */
-    --secondary-color: #bc13fe;
-    /* Neon Purple */
+    /* Neon Accents */
+    --neon-cyan: #00f3ff;
+    --neon-purple: #bc13fe;
+    --neon-green: #05ffa1;
+    --danger: #ff2a6d;
+
+    /* Text */
     --text-primary: #ffffff;
-    --text-secondary: #b3b3b3;
+    --text-muted: #777777;
+    --text-dim: #444444;
 
-    --accent-gradient: linear-gradient(90deg, #00f2ff, #bc13fe);
-    --slider-track: rgba(255, 255, 255, 0.1);
+    /* Glows */
+    --glow-cyan: 0 0 12px rgba(0, 243, 255, 0.5);
+    --glow-purple: 0 0 15px rgba(188, 19, 254, 0.4);
+    --glow-cyan-sm: 0 0 6px rgba(0, 243, 255, 0.35);
 
-    --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* Gradient */
+    --accent-gradient: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+
+    /* Fonts */
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --font-display: 'Outfit', sans-serif;
+}
+
+/* ====================================================
+   BASE
+   ==================================================== */
+* {
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
     padding: 0;
     width: 380px;
-    /* Slightly wider for better spacing */
     min-height: 500px;
-    font-family: var(--font-stack);
-    background: var(--bg-gradient);
+    font-family: var(--font-mono);
+    background-color: var(--void-bg);
     color: var(--text-primary);
     overflow-x: hidden;
 }
 
 .app-container {
     padding: 2px;
-    /* Slight padding to show edge */
     display: flex;
     flex-direction: column;
     height: 100vh;
     box-sizing: border-box;
+    position: relative;
 }
 
-/* ========== TAB NAVIGATION ========== */
+/* ====================================================
+   AMBIENT GLOW BLOBS
+   ==================================================== */
+.bg-glow-1 {
+    position: fixed;
+    top: -60px;
+    left: -60px;
+    width: 220px;
+    height: 220px;
+    background: var(--neon-purple);
+    filter: blur(90px);
+    opacity: 0.12;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.bg-glow-2 {
+    position: fixed;
+    bottom: -60px;
+    right: -60px;
+    width: 160px;
+    height: 160px;
+    background: var(--neon-cyan);
+    filter: blur(80px);
+    opacity: 0.09;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ====================================================
+   TAB NAVIGATION
+   ==================================================== */
 .tab-nav {
     display: flex;
-    background: rgba(15, 12, 41, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(5, 5, 5, 0.95);
     border-bottom: 1px solid var(--glass-border);
     position: sticky;
     top: 0;
     z-index: 100;
-    padding: 8px 4px;
+    padding: 6px 4px;
     justify-content: space-around;
 }
 
 .tab-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    padding: 8px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 9px;
+    font-family: var(--font-mono);
     font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
     opacity: 0.7;
+    position: relative;
 }
 
 .tab-btn svg {
-    width: 20px;
-    height: 20px;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 18px;
+    height: 18px;
+    transition: transform 0.25s ease;
     fill: currentColor;
 }
 
 .tab-btn:hover {
     color: var(--text-primary);
     opacity: 1;
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .tab-btn:hover svg {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .tab-btn.active {
-    color: var(--primary-color);
+    color: var(--neon-cyan);
     opacity: 1;
-    background: rgba(0, 242, 255, 0.1);
-    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+    background: rgba(0, 243, 255, 0.07);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: var(--neon-cyan);
+    box-shadow: var(--glow-cyan-sm);
 }
 
 .tab-btn.active svg {
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 5px var(--primary-color));
+    filter: drop-shadow(0 0 4px var(--neon-cyan));
 }
 
-/* ========== TAB CONTENT ========== */
+/* ====================================================
+   TAB CONTENT
+   ==================================================== */
 .tab-content {
     display: none;
-    padding: 20px;
-    animation: slideIn 0.3s ease-out forwards;
+    padding: 18px;
+    animation: stitch-slide-in 0.25s ease-out forwards;
     flex: 1;
     overflow-y: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .tab-content.active {
     display: block;
 }
 
-@keyframes slideIn {
+@keyframes stitch-slide-in {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
 
     to {
@@ -123,73 +193,85 @@ body {
     }
 }
 
+/* ====================================================
+   TYPOGRAPHY
+   ==================================================== */
 h2,
 h3 {
     margin: 0;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-weight: 700;
 }
 
 h2 {
-    font-size: 18px;
-    margin-bottom: 16px;
+    font-family: var(--font-display);
+    font-size: 17px;
+    margin-bottom: 14px;
     background: var(--accent-gradient);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+    letter-spacing: 0.5px;
 }
 
 h3 {
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 9px;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+}
+
+/* ====================================================
+   GLASS PANELS / CONFIG CARDS
+   ==================================================== */
+.glass-panel {
+    background: var(--glass-surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 14px;
     margin-bottom: 12px;
 }
 
-/* ========== GLASS CARDS ========== */
-.glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* ========== VOLUME CONTROLS ========== */
+/* ====================================================
+   VOLUME CONTROLS
+   ==================================================== */
 .current-tab-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .tab-info {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 8px 16px;
-    border-radius: 20px;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 14px;
+    border-radius: 3px;
     border: 1px solid var(--glass-border);
 }
 
 .favicon {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
 }
 
 .tab-title {
-    font-size: 13px;
+    font-size: 11px;
+    font-family: var(--font-mono);
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-primary);
+    color: var(--text-muted);
 }
 
+/* Volume Circle */
 .volume-circle {
     position: relative;
     width: 140px;
@@ -198,9 +280,10 @@ h3 {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: radial-gradient(circle at center, rgba(48, 43, 99, 0.5), transparent 70%);
-    box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
-    margin: 10px 0;
+    background: radial-gradient(circle at center, rgba(0, 243, 255, 0.06), transparent 70%);
+    border: 1px solid rgba(0, 243, 255, 0.15);
+    box-shadow: 0 0 24px rgba(0, 243, 255, 0.08), inset 0 0 20px rgba(0, 0, 0, 0.6);
+    margin: 8px 0;
 }
 
 .volume-display {
@@ -209,110 +292,181 @@ h3 {
 }
 
 .percentage-display {
-    font-size: 36px;
+    font-family: var(--font-display);
+    font-size: 34px;
     font-weight: 700;
-    color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-cyan);
+    letter-spacing: -1px;
 }
 
 .percentage-label {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
-/* Custom Range Slider */
+/* ====================================================
+   SLIDERS
+   ==================================================== */
 .slider-container {
     width: 100%;
     position: relative;
     padding: 10px 0;
 }
 
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+}
+
 input[type=range] {
     -webkit-appearance: none;
+    appearance: none;
     width: 100%;
-    height: 6px;
-    background: var(--slider-track);
-    border-radius: 3px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
     outline: none;
 }
 
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: var(--text-primary);
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    background: var(--void-bg);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 2px;
     cursor: pointer;
-    box-shadow: 0 0 10px var(--primary-color);
-    transition: transform 0.1s;
-    margin-top: -7px;
-    /* Align vertical */
+    box-shadow: var(--glow-cyan-sm);
+    transition: transform 0.1s, box-shadow 0.1s;
+    margin-top: -6px;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
     width: 100%;
-    height: 6px;
+    height: 4px;
     cursor: pointer;
-    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    border-radius: 3px;
+    background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-purple) 100%);
+    border-radius: 2px;
 }
 
 input[type=range]:hover::-webkit-slider-thumb {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: var(--glow-cyan);
 }
 
-/* Control Buttons */
+/* ====================================================
+   CONTROL BUTTONS
+   ==================================================== */
 .control-buttons {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .control-btn {
-    background: var(--glass-bg);
+    background: var(--glass-surface);
     border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    color: var(--text-muted);
+    width: 42px;
+    height: 42px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    font-family: var(--font-mono);
 }
 
 .control-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     fill: currentColor;
 }
 
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: rgba(0, 243, 255, 0.08);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan-sm);
+    transform: translateY(-1px);
 }
 
 .control-btn:active {
     transform: translateY(0);
 }
 
-/* ========== VISUALIZER ========== */
+/* ====================================================
+   PRESET BUTTONS (Volume)
+   ==================================================== */
+.preset-buttons {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+}
+
+.preset-btn {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 8px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.preset-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.preset-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    background: rgba(0, 243, 255, 0.07);
+    box-shadow: var(--glow-cyan-sm);
+}
+
+.preset-btn.active {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    background: rgba(0, 243, 255, 0.12);
+}
+
+/* ====================================================
+   VISUALIZER
+   ==================================================== */
 .visualizer-container {
     width: 100%;
-    height: 60px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     position: relative;
+    border: 1px dashed var(--glass-border);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .visualizer-container::after {
@@ -322,10 +476,13 @@ input[type=range]:hover::-webkit-slider-thumb {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    opacity: 0.3;
 }
 
-/* ========== EQUALIZER ========== */
+/* ====================================================
+   EQUALIZER
+   ==================================================== */
 .eq-container {
     display: flex;
     justify-content: space-between;
@@ -341,51 +498,98 @@ input[type=range]:hover::-webkit-slider-thumb {
     flex: 1;
 }
 
+.eq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.eq-reset-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.eq-reset-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
 .eq-slider {
     -webkit-appearance: slider-vertical;
-    width: 8px;
-    height: 140px;
-    background: var(--slider-track);
-    border-radius: 4px;
+    appearance: slider-vertical;
+    width: 6px;
+    height: 130px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 3px;
     cursor: pointer;
-    accent-color: var(--secondary-color);
+    accent-color: var(--neon-purple);
 }
 
 .eq-value {
-    font-size: 10px;
-    color: var(--secondary-color);
-    font-weight: 600;
+    font-size: 9px;
+    font-family: var(--font-mono);
+    color: var(--neon-purple);
+    font-weight: 700;
 }
 
 .eq-label {
-    font-size: 9px;
-    color: var(--text-secondary);
+    font-size: 8px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
     transform: rotate(-45deg);
     margin-top: 5px;
+    letter-spacing: 0.5px;
 }
 
-/* ========== PRESETS & CARDS ========== */
+/* Spectrum container */
+.spectrum-container {
+    border: 1px dashed var(--glass-border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    margin-bottom: 8px;
+}
+
+/* ====================================================
+   PRESETS GRID
+   ==================================================== */
+.presets-description {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin: 0 0 14px 0;
+    letter-spacing: 0.3px;
+}
+
 .presets-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
 .preset-card {
-    background: var(--glass-bg);
+    background: var(--glass-surface);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 16px;
-    /* Increased padding */
+    border-radius: 6px;
+    padding: 14px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.25s ease;
     height: 80px;
-    /* Fixed height for uniformity */
     position: relative;
     overflow: hidden;
 }
@@ -394,182 +598,218 @@ input[type=range]:hover::-webkit-slider-thumb {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
+    background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.08), transparent);
+    transition: left 0.4s ease;
 }
 
 .preset-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--secondary-color);
-    box-shadow: 0 8px 16px rgba(188, 19, 254, 0.2);
+    border-color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan-sm);
+    transform: translateY(-2px);
 }
 
 .preset-card:hover::before {
-    opacity: 1;
+    left: 100%;
 }
 
 .preset-card.active {
-    background: rgba(188, 19, 254, 0.15);
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
+    background: rgba(188, 19, 254, 0.12);
+    border-color: var(--neon-purple);
+    box-shadow: var(--glow-purple);
 }
 
 .preset-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    font-size: 22px;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .preset-card h3 {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-primary);
     margin: 0;
-    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .preset-card p {
-    font-size: 10px;
-    color: var(--text-secondary);
-    margin: 4px 0 0 0;
+    font-size: 9px;
+    color: var(--text-muted);
+    margin: 3px 0 0 0;
+    letter-spacing: 0.3px;
 }
 
-/* ========== SETTINGS ========== */
+/* ====================================================
+   SETTINGS
+   ==================================================== */
 .settings-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .settings-btn {
-    background: var(--glass-bg);
+    background: var(--glass-surface);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
-    padding: 12px;
-    border-radius: 10px;
+    padding: 11px 12px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     cursor: pointer;
-    transition: all 0.2s;
-    font-size: 14px;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    font-family: var(--font-mono);
     width: 100%;
     box-sizing: border-box;
+    letter-spacing: 0.3px;
+}
+
+.settings-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    flex-shrink: 0;
 }
 
 .settings-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(4px);
-    border-color: var(--text-secondary);
+    background: rgba(0, 243, 255, 0.06);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: translateX(3px);
+}
+
+.settings-btn:hover svg {
+    filter: drop-shadow(0 0 4px var(--neon-cyan));
 }
 
 .settings-group h3 {
-    margin-top: 20px;
-    padding-bottom: 8px;
+    margin-top: 18px;
+    padding-bottom: 6px;
     border-bottom: 1px solid var(--glass-border);
 }
 
-/* ========== SCROLLBAR ========== */
+/* ====================================================
+   SCROLLBAR
+   ==================================================== */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
+    background: rgba(0, 243, 255, 0.2);
+    border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 243, 255, 0.4);
 }
 
-/* ========== TOGGLE SWITCH ========== */
+/* ====================================================
+   TOGGLE SWITCH
+   ==================================================== */
 .switch {
-    width: 44px;
-    height: 24px;
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .slider {
-    background-color: rgba(255, 255, 255, 0.1);
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition: 0.3s;
+    border-radius: 2px;
+    border: 1px solid var(--glass-border);
 }
 
 .slider:before {
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: var(--text-secondary);
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--text-muted);
+    transition: 0.3s;
+    border-radius: 1px;
 }
 
 input:checked+.slider {
-    background-color: var(--primary-color);
+    background-color: rgba(0, 243, 255, 0.15);
+    border-color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan-sm);
 }
 
 input:checked+.slider:before {
-    background-color: #fff;
-    transform: translateX(20px);
+    background-color: var(--neon-cyan);
+    transform: translateX(18px);
 }
 
-/* Debug Panel */
-.debug-panel {
-    background: #000 !important;
-    border: 1px solid var(--primary-color) !important;
-    color: var(--primary-color);
-}
-
-.debug-stat span:first-child {
-    color: #fff;
-}
-
-/* ========== VOLUME CIRCLE WRAPPER (Mute) ========== */
+/* ====================================================
+   MUTE BUTTON
+   ==================================================== */
 .volume-circle-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    position: relative;
 }
 
 .mute-btn {
-    background: var(--glass-bg);
+    background: var(--glass-surface);
     border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    color: var(--text-muted);
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
 }
 
 .mute-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     fill: currentColor;
     display: block;
 }
 
 .mute-btn:hover {
-    background: rgba(0, 242, 255, 0.15);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: 0 0 12px rgba(0, 242, 255, 0.3);
-    transform: scale(1.1);
+    background: rgba(0, 243, 255, 0.08);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan-sm);
 }
 
 .mute-btn.muted {
-    background: rgba(255, 60, 60, 0.2);
-    border-color: #ff3c3c;
-    color: #ff3c3c;
-    box-shadow: 0 0 14px rgba(255, 60, 60, 0.4);
+    background: rgba(255, 42, 109, 0.12);
+    border-color: var(--danger);
+    color: var(--danger);
+    box-shadow: 0 0 12px rgba(255, 42, 109, 0.35);
     animation: mutePulse 2s ease-in-out infinite;
 }
 
@@ -577,21 +817,23 @@ input:checked+.slider:before {
 
     0%,
     100% {
-        box-shadow: 0 0 14px rgba(255, 60, 60, 0.4);
+        box-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
     }
 
     50% {
-        box-shadow: 0 0 22px rgba(255, 60, 60, 0.7);
+        box-shadow: 0 0 20px rgba(255, 42, 109, 0.6);
     }
 }
 
-/* ========== FEATURE PANELS (Pan & Sleep) ========== */
+/* ====================================================
+   FEATURE PANELS (Pan / Sleep / Speed)
+   ==================================================== */
 .feature-panel {
-    background: var(--glass-bg);
+    background: var(--glass-surface);
     border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    padding: 12px 14px;
-    margin-bottom: 12px;
+    border-radius: 5px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -601,74 +843,82 @@ input:checked+.slider:before {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .feature-value {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--primary-color);
-    text-shadow: 0 0 8px rgba(0, 242, 255, 0.5);
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-cyan-sm);
     min-width: 55px;
     text-align: right;
+    font-family: var(--font-mono);
 }
 
 .mini-reset-btn {
     background: transparent;
     border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-    font-size: 11px;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-family: var(--font-mono);
+    letter-spacing: 1px;
+    text-transform: uppercase;
     padding: 4px 10px;
-    border-radius: 8px;
+    border-radius: 3px;
     cursor: pointer;
     margin-top: 6px;
     transition: all 0.2s;
 }
 
 .mini-reset-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
 }
 
-/* ========== SLEEP TIMER BUTTONS ========== */
+/* Sleep Timer Buttons */
 .sleep-timer-controls {
     display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 6px;
 }
 
 .sleep-btn {
     flex: 1;
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 7px 4px;
-    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 6px 4px;
+    border-radius: 3px;
     cursor: pointer;
     transition: all 0.2s ease;
+    letter-spacing: 0.5px;
 }
 
 .sleep-btn:hover {
-    border-color: var(--secondary-color);
-    color: var(--secondary-color);
-    background: rgba(188, 19, 254, 0.12);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+    background: rgba(188, 19, 254, 0.08);
 }
 
 .sleep-btn.active {
-    background: rgba(188, 19, 254, 0.2);
-    border-color: var(--secondary-color);
-    color: var(--secondary-color);
-    box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+    background: rgba(188, 19, 254, 0.15);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+    box-shadow: var(--glow-purple);
 }
 
-/* ========== PLAYBACK SPEED PRESETS ========== */
+/* Speed Preset Buttons */
 .speed-presets {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     margin-top: 8px;
     flex-wrap: wrap;
 }
@@ -676,36 +926,187 @@ input:checked+.slider:before {
 .speed-preset-btn {
     flex: 1;
     min-width: 0;
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 4px;
-    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 5px 3px;
+    border-radius: 3px;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    letter-spacing: 0.3px;
 }
 
 .speed-preset-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: rgba(0, 242, 255, 0.1);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    background: rgba(0, 243, 255, 0.07);
 }
 
 .speed-preset-btn.active {
-    background: rgba(0, 242, 255, 0.18);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.25);
+    background: rgba(0, 243, 255, 0.14);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan-sm);
 }
 
-/* ========== WONDER FEATURE 1: PULSING GLOW RING ========== */
-.volume-circle {
-    position: relative;
+/* ====================================================
+   DIVIDER
+   ==================================================== */
+.divider {
+    border: none;
+    border-top: 1px solid var(--glass-border);
+    margin: 14px 0;
 }
 
+/* ====================================================
+   AUDIO TABS LIST
+   ==================================================== */
+.audio-tabs-section {
+    margin-top: 4px;
+}
+
+.tabs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tabs-list li {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed var(--glass-border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tabs-list li:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
+.no-audio-msg {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+    text-align: center;
+    padding: 12px;
+    border: 1px dashed var(--glass-border);
+    border-radius: 4px;
+}
+
+/* ====================================================
+   KEYBOARD SHORTCUTS
+   ==================================================== */
+.shortcuts-section {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    background: var(--glass-surface);
+    backdrop-filter: blur(8px);
+}
+
+.shortcuts-section summary {
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    outline: none;
+    transition: color 0.2s;
+}
+
+.shortcuts-section summary:hover {
+    color: var(--neon-cyan);
+}
+
+.shortcuts-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.shortcut-key {
+    background: rgba(0, 243, 255, 0.08);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    color: var(--neon-cyan);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.shortcut-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* ====================================================
+   ABOUT SECTION
+   ==================================================== */
+.about-section {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.about-section p {
+    margin: 4px 0;
+    letter-spacing: 0.3px;
+}
+
+.about-section strong {
+    color: var(--neon-cyan);
+}
+
+.credits {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 8px !important;
+}
+
+/* ====================================================
+   DEBUG PANEL
+   ==================================================== */
+.debug-panel {
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid var(--neon-cyan) !important;
+    color: var(--neon-cyan);
+    font-family: var(--font-mono);
+    border-radius: 4px;
+}
+
+.debug-stat span:first-child {
+    color: var(--text-primary);
+}
+
+/* ====================================================
+   WONDER FEATURE 1: PULSING GLOW RING
+   ==================================================== */
 .pulse-ring-svg {
     position: absolute;
     top: 0;
@@ -717,8 +1118,8 @@ input:checked+.slider:before {
 }
 
 .pulse-ring-circle {
-    stroke-opacity: var(--ring-opacity, 0.4);
-    filter: drop-shadow(0 0 calc(var(--glow-intensity, 4px)) var(--primary-color)) drop-shadow(0 0 calc(var(--glow-intensity2, 2px)) var(--secondary-color));
+    stroke-opacity: var(--ring-opacity, 0.35);
+    filter: drop-shadow(0 0 calc(var(--glow-intensity, 5px)) var(--neon-cyan)) drop-shadow(0 0 calc(var(--glow-intensity2, 3px)) var(--neon-purple));
     animation: ringPulse 2.4s ease-in-out infinite;
     transform-origin: 70px 70px;
     transform-box: fill-box;
@@ -731,20 +1132,18 @@ input:checked+.slider:before {
     0%,
     100% {
         transform: scale(1);
-        stroke-opacity: var(--ring-opacity, 0.4);
+        stroke-opacity: var(--ring-opacity, 0.35);
     }
 
     50% {
         transform: scale(1.03);
-        stroke-opacity: calc(var(--ring-opacity, 0.4) * 1.8);
+        stroke-opacity: calc(var(--ring-opacity, 0.35) * 2);
     }
 }
 
-/* ========== WONDER FEATURE 2: RIPPLE BURST ========== */
-.volume-circle-wrapper {
-    position: relative;
-}
-
+/* ====================================================
+   WONDER FEATURE 2: RIPPLE BURST
+   ==================================================== */
 .ripple {
     position: absolute;
     top: 50%;
@@ -760,52 +1159,55 @@ input:checked+.slider:before {
 }
 
 .ripple.burst {
-    animation: rippleBurst 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: rippleBurst 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 @keyframes rippleBurst {
     0% {
         transform: scale(1);
-        opacity: 0.8;
-        box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.6),
-            0 0 0 0 rgba(188, 19, 254, 0.4);
+        opacity: 0.7;
+        box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.5),
+            0 0 0 0 rgba(188, 19, 254, 0.35);
     }
 
     100% {
         transform: scale(1.8);
         opacity: 0;
-        box-shadow: 0 0 0 24px rgba(0, 242, 255, 0),
-            0 0 0 36px rgba(188, 19, 254, 0);
+        box-shadow: 0 0 0 22px rgba(0, 243, 255, 0),
+            0 0 0 34px rgba(188, 19, 254, 0);
     }
 }
 
-/* ========== WONDER FEATURE 3: AUDIO MOOD RING ========== */
+/* ====================================================
+   WONDER FEATURE 3: AUDIO MOOD RING
+   ==================================================== */
 .mood-ring {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 16px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    padding: 5px 14px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: default;
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;
     background-size: 200% 200%;
     animation: moodGradientShift 4s ease infinite;
-    /* default mood gradient, overridden by JS */
-    background-image: linear-gradient(135deg, rgba(0, 242, 255, 0.15), rgba(188, 19, 254, 0.15));
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-image: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(188, 19, 254, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .mood-ring:hover {
-    transform: scale(1.04);
+    transform: scale(1.03);
 }
 
 .mood-icon {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -816,39 +1218,38 @@ input:checked+.slider:before {
 
 .mood-label {
     color: var(--text-primary);
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
     transition: all 0.35s ease;
 }
 
-/* Mood-specific gradient themes */
 .mood-ring.mood-bass {
-    background-image: linear-gradient(135deg, rgba(188, 19, 254, 0.25), rgba(255, 50, 50, 0.2));
-    border-color: rgba(188, 19, 254, 0.4);
+    background-image: linear-gradient(135deg, rgba(188, 19, 254, 0.2), rgba(255, 50, 50, 0.15));
+    border-color: rgba(188, 19, 254, 0.35);
 }
 
 .mood-ring.mood-crisp {
-    background-image: linear-gradient(135deg, rgba(0, 242, 255, 0.25), rgba(0, 200, 180, 0.2));
-    border-color: rgba(0, 242, 255, 0.4);
+    background-image: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(0, 200, 180, 0.15));
+    border-color: rgba(0, 243, 255, 0.35);
 }
 
 .mood-ring.mood-warm {
-    background-image: linear-gradient(135deg, rgba(255, 160, 50, 0.25), rgba(255, 80, 80, 0.2));
-    border-color: rgba(255, 160, 50, 0.4);
+    background-image: linear-gradient(135deg, rgba(255, 160, 50, 0.2), rgba(255, 80, 80, 0.15));
+    border-color: rgba(255, 160, 50, 0.35);
 }
 
 .mood-ring.mood-vocal {
-    background-image: linear-gradient(135deg, rgba(80, 220, 130, 0.25), rgba(0, 180, 255, 0.2));
-    border-color: rgba(80, 220, 130, 0.4);
+    background-image: linear-gradient(135deg, rgba(80, 220, 130, 0.2), rgba(0, 180, 255, 0.15));
+    border-color: rgba(80, 220, 130, 0.35);
 }
 
 .mood-ring.mood-space {
-    background-image: linear-gradient(135deg, rgba(30, 0, 80, 0.5), rgba(188, 19, 254, 0.3));
-    border-color: rgba(120, 0, 200, 0.5);
+    background-image: linear-gradient(135deg, rgba(30, 0, 80, 0.5), rgba(188, 19, 254, 0.25));
+    border-color: rgba(120, 0, 200, 0.4);
 }
 
 .mood-ring.mood-flat {
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-    border-color: rgba(255, 255, 255, 0.12);
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 @keyframes moodGradientShift {
@@ -865,7 +1266,6 @@ input:checked+.slider:before {
     }
 }
 
-/* Mood label pop-in */
 @keyframes moodPop {
     0% {
         opacity: 0;
@@ -880,4 +1280,19 @@ input:checked+.slider:before {
 
 .mood-ring.mood-changed {
     animation: moodGradientShift 4s ease infinite, moodPop 0.4s ease forwards;
+}
+
+/* ====================================================
+   SETTING ITEM (Debug toggle row)
+   ==================================================== */
+.setting-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.setting-label small {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
 }
