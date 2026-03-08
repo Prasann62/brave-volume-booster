@@ -34,10 +34,23 @@ A professional, open-source browser extension that transforms audio playback wit
 - **Quick presets**: One-click access to 100%, 200%, 400%, and 600%
 - **Fine-tune control**: Precise slider with ±10% adjustment buttons
 
+### 🌌 Spatial Environments & Reverb
+- **Simulation**: Experience audio as if you were in a Studio, Small Room, Large Hall, Cathedral, or Outer Space
+- **Convolution Reverb**: Smooth crossfading between different acoustic environments
+
+### 🎚️ Playback & Pan Controls
+- **Stereo Panning**: Precise left/right audio balance control
+- **Playback Speed**: Adjust speed from 0.25x to 4.0x with quick presets
+
+### ⏱️ Sleep Timer
+- **Auto-pause**: Automatically stop audio after 15, 30, 60, or 90 minutes
+- Perfect for listening while falling asleep
+
 ### 🎨 Modern Tabbed Interface
-- **Volume Tab**: Main volume controls with visualizer
+- **Volume Tab**: Main volume controls with visualizer, pan, speed, and sleep timer
 - **Equalizer Tab**: 10-band EQ with spectrum analyzer
 - **Presets Tab**: Quick access to audio enhancement modes
+- **Environments Tab**: Simulated acoustic spaces
 - **Settings Tab**: Export/import, shortcuts, and configuration
 
 ### ⌨️ Keyboard Shortcuts
@@ -168,7 +181,15 @@ Cannot run on browser internal pages:
 
 ## 📝 Changelog
 
-### Version 2.0.0 (Major Update - Latest)
+### Version 2.1.0 (Latest Update)
+- ✨ **NEW**: Spatial Environments (Studio, Small Room, Large Hall, Cathedral, Space)
+- ✨ **NEW**: Stereo Panning control
+- ✨ **NEW**: Sleep Timer for automatic pause
+- ✨ **NEW**: Playback Speed Control (0.25x - 4.0x)
+- 🚀 Enhanced UI with new feature panels for volume tab
+- 🌌 New Environments tab for quick access to reverb spaces
+
+### Version 2.0.0 (Major Update)
 - ✨ **NEW**: 10-band graphic equalizer (31Hz - 16kHz)
 - ✨ **NEW**: 8 professional audio presets
 - ✨ **NEW**: Real-time spectrum analyzer
