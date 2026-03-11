@@ -169,7 +169,7 @@ Cannot run on browser internal pages:
 1. Refresh the webpage
 2. Ensure audio is playing
 3. Try applying a preset first
-
+      
 ### Spectrum analyzer not updating?
 - The analyzer requires active audio playback
 - Switch to the Equalizer tab to activate it
@@ -243,3 +243,5 @@ If you find this extension useful:
 ---
 
 **Made with 🎵 for music and video lovers everywhere**
+
+*Last updated: March 2026*
