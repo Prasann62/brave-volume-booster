@@ -21,6 +21,7 @@ A professional, open-source browser extension that transforms audio playback wit
 - **V-Shape**: Bass and treble emphasis (popular for music)
 - **Bass**: Maximum bass power
 - **Electronic**: Perfect for EDM and electronic music
+- **Acoustic**: Clear instruments and vocals
 
 ### 📊 Real-Time Spectrum Analyzer
 - Visual frequency spectrum display

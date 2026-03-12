@@ -35,7 +35,8 @@ class AudioEnhancer {
             trebleBoost: [0, 0, -1, -1, 0, 1, 3, 5, 5, 4],
             vShape: [4, 4, 2, -2, -3, -2, 1, 3, 4, 4],
             bass: [8, 6, 4, 2, 0, 0, 0, 0, 0, 0],
-            electronic: [4, 3, 0, -2, 2, 1, 1, 3, 4, 5]
+            electronic: [4, 3, 0, -2, 2, 1, 1, 3, 4, 5],
+            acoustic: [2, 1, 0, -1, 1, 2, 2, 3, 3, 2]
         };
 
         // Environment Impulse Responses settings (seconds, decay)
