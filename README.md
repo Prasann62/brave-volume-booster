@@ -243,6 +243,6 @@ If you find this extension useful:
 
 ---
 
-**Made with 🎵 for music and video lovers everywhere**
+**Made with 🎵 for music and video lovers everywhere** 
 
 *Last updated: March 2026*
