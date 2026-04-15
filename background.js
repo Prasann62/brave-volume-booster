@@ -1,5 +1,5 @@
-// Background Service Worker
-// Handles installation, shortcuts, and global events
+// Background Service Worker for Volume Booster
+// Handles installation, keyboard shortcuts, and global events
 
 chrome.runtime.onInstalled.addListener(() => {
     console.log("Volume Booster extension installed.");
